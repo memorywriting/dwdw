@@ -66,19 +66,6 @@ w1:Button(
     end
 )
 
-w1:Button(
-    "Instant Leave (Server)",
-    function()
-        game.Players.LocalPlayer:Kick("bye bye")
-    end
-)
-
-w1:Button(
-    "Reset Character",
-    function()
-        game.Players.LocalPlayer.Character.Humanoid.Health = 0
-    end
-)
 
 local w2 = library:Window("RF24 | MISC")
 
@@ -100,6 +87,20 @@ UserInputService.InputBegan:Connect(function(input)
         game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(mouse.Hit.p)
     end
 end)
+
+w2:Button(
+    "Instant Leave (Server)",
+    function()
+        game.Players.LocalPlayer:Kick("bye bye")
+    end
+)
+
+w2:Button(
+    "Reset Character",
+    function()
+        game.Players.LocalPlayer.Character.Humanoid.Health = 0
+    end
+)
 
 w2:Slider(
     "Speed",
