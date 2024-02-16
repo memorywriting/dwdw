@@ -46,33 +46,31 @@ w1:Button(
     end
 )
 
-local targetColor = BrickColor.new(Color3.fromRGB(237, 234, 234))
 local footSize = 1  -- Default foot size
 
+
 w1:Toggle(
-    "Foot Size",
+    "Reach",
     "FootSize",
     false,
     function(toggled)
         local rightFoot = game.Players.LocalPlayer.Character:FindFirstChild("RightFoot")
         if toggled and rightFoot then
             rightFoot.Size = Vector3.new(footSize, footSize, footSize)
-            for i,v in pairs(Workspace:GetDescendants()) do
-                if v:IsA("BasePart") and v.CanCollide == true and v.Transparency == 1 and v.BrickColor == targetColor then
-                    rightFoot.CanCollide = true
-                else
-                    rightFoot.CanCollide = false
-                end
-            end
+            local bodyPos = Instance.new("BodyPosition")
+            bodyPos.Position = rightFoot.Position
+            rightFoot.BodyPosition = bodyPos
         elseif rightFoot then
             rightFoot.Size = Vector3.new(1, 1, 1)  -- Reset to original size
-            rightFoot.CanCollide = true
+            if rightFoot:FindFirstChild("BodyPosition") then
+                rightFoot.BodyPosition:Remove()
+            end
         end
     end
 )
 
 w1:Slider(
-    "Size",
+    "Radius",
     "Size",
     1,
     10,
