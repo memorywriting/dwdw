@@ -57,7 +57,7 @@ w2:Toggle(
     function(toggled)
         local rightFoot = game.Players.LocalPlayer.Character:FindFirstChild("RightFoot")
         if toggled and rightFoot then
-            w1:Slider(
+            w2:Slider(
                 "Radius",
                 "Size",
                 1,
