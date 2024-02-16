@@ -1,0 +1,87 @@
+getgenv().SecureMode = true
+local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
+
+local Window = Rayfield:CreateWindow({
+   Name = "RF24 | FUCKER",
+   LoadingTitle = "Rayfield Interface Suite",
+   LoadingSubtitle = "by Sirius",
+   ConfigurationSaving = {
+      Enabled = true,
+      FolderName = nil,
+      FileName = "RF24"
+   },
+})
+
+local Tab = Window:CreateTab("Main")
+
+local Workspace = game:GetService("Workspace")
+local targetColor = BrickColor.new(Color3.fromRGB(237, 234, 234))
+local speed = 16
+local fov = 70
+
+Tab:CreateButton({
+   Name = "TP ball",
+   Callback = function()
+       for i,v in pairs(Workspace:GetDescendants()) do
+           if v:IsA("BasePart") and v.CanCollide == true and v.Transparency == 1 and v.BrickColor == targetColor then
+               game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = v.CFrame
+               break
+           end
+       end
+   end,
+})
+
+Tab:CreateButton({
+   Name = "Anchor TP (OP)",
+   Callback = function()
+       for i,v in pairs(Workspace:GetDescendants()) do
+           if v:IsA("BasePart") and v.CanCollide == true and v.Transparency == 1 and v.BrickColor == targetColor then
+               v.Anchored = true
+               v.CFrame = game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame
+               break
+           end
+       end
+   end,
+})
+
+Tab:CreateButton({
+   Name = "Instant Leave (Server)",
+   Callback = function()
+       game.Players.LocalPlayer:Kick("bye bye")
+   end,
+})
+
+Tab:CreateSlider({
+   Name = "Speed",
+   Range = {0, 25},
+   Increment = 1,
+   Suffix = "speed",
+   CurrentValue = speed,
+   Flag = "Speed",
+   Callback = function(value)
+       speed = value
+       game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = speed
+   end,
+})
+
+Tab:CreateSlider({
+   Name = "FOV",
+   Range = {0, 180},
+   Increment = 1,
+   Suffix = "fov",
+   CurrentValue = fov,
+   Flag = "FOV",
+   Callback = function(value)
+       fov = value
+       game.Workspace.CurrentCamera.FieldOfView = fov
+   end,
+})
+
+Tab:CreateToggle({
+   Name = "swithc!",
+   CurrentValue = true,
+   Flag = "swithc",
+   Callback = function(bool)
+       print("switch set to: ", bool)
+   end,
+})
