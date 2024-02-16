@@ -39,6 +39,13 @@ w1:Button(
     end
 )
 
+w1:Button(
+    "Reset Character",
+    function()
+        game.Players.LocalPlayer.Character.Humanoid.Health = 0
+    end
+)
+
 w1:Slider(
     "Speed",
     "WS",
