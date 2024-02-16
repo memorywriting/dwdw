@@ -46,17 +46,19 @@ w1:Button(
     end
 )
 
+local w2 = library:Window("RF24 | MISC")
+
 local targetColor = BrickColor.new(Color3.fromRGB(237, 234, 234))
 
-w1:Toggle(
-    "Foot Size",
+w2:Toggle(
+    "Reach",
     "FootSize",
     false,
     function(toggled)
         local rightFoot = game.Players.LocalPlayer.Character:FindFirstChild("RightFoot")
         if toggled and rightFoot then
             w1:Slider(
-                "Size",
+                "Radius",
                 "Size",
                 1,
                 10,
@@ -81,7 +83,7 @@ w1:Toggle(
 local UserInputService = game:GetService("UserInputService")
 local ctrlTPEnabled = false
 
-w1:Toggle(
+w2:Toggle(
     "Ctrl+TP",
     "CtrlTP",
     false,
@@ -97,7 +99,7 @@ UserInputService.InputBegan:Connect(function(input)
     end
 end)
 
-w1:Slider(
+w2:Slider(
     "Speed",
     "WS",
     16,
@@ -108,7 +110,7 @@ w1:Slider(
     end
 )
 
-w1:Slider(
+w2:Slider(
     "FOV",
     "FOV",
     0,
