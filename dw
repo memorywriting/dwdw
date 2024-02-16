@@ -47,7 +47,7 @@ w1:Button(
 )
 
 w1:Toggle(
-    "Foot Size",
+    "dwdw Size",
     "FootSize",
     false,
     function(toggled)
