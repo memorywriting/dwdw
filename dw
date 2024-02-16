@@ -46,6 +46,45 @@ w1:Button(
     end
 )
 
+local Workspace = game:GetService("Workspace")
+local targetColor = BrickColor.new(Color3.fromRGB(237, 234, 234))
+local boxSize = 1
+
+local selectionBox = Instance.new("SelectionBox")
+selectionBox.Parent = Workspace
+selectionBox.Adornee = nil
+
+w1:Toggle(
+    "Reach",
+    "Reach",
+    false,
+    function(toggled)
+        if toggled then
+            for _, part in ipairs(Workspace:GetDescendants()) do
+                if part:IsA("BasePart") and part.CanCollide == true and part.Transparency == 1 and part.BrickColor == targetColor then
+                    selectionBox.Adornee = part
+                    selectionBox.Size = Vector3.new(boxSize, boxSize, boxSize)
+                end
+            end
+        else
+            selectionBox.Adornee = nil
+        end
+    end
+)
+
+w1:Slider(
+    "Reach Radius",
+    "BoxSize",
+    1,
+    10,
+    function(value)
+        boxSize = value
+        if selectionBox.Adornee then
+            selectionBox.Size = Vector3.new(boxSize, boxSize, boxSize)
+        end
+    end
+)
+
 local UserInputService = game:GetService("UserInputService")
 local ctrlTPEnabled = false
 
