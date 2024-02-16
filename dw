@@ -46,8 +46,6 @@ w1:Button(
     end
 )
 
-local targetColor = BrickColor.new(Color3.fromRGB(237, 234, 234))
-
 w1:Toggle(
     "Foot Size",
     "FootSize",
@@ -62,18 +60,10 @@ w1:Toggle(
                 10,
                 function(value)
                     rightFoot.Size = Vector3.new(value, value, value)
-                    for i,v in pairs(Workspace:GetDescendants()) do
-                        if v:IsA("BasePart") and v.CanCollide == true and v.Transparency == 1 and v.BrickColor == targetColor then
-                            rightFoot.CanCollide = true
-                        else
-                            rightFoot.CanCollide = false
-                        end
-                    end
                 end
             )
         elseif rightFoot then
             rightFoot.Size = Vector3.new(1, 1, 1)  -- Reset to original size
-            rightFoot.CanCollide = true
         end
     end
 )
