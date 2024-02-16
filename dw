@@ -2,6 +2,30 @@ local library = loadstring(game.HttpGet(game, "https://raw.githubusercontent.com
 
 local w1 = library:Window("RF24 | FUCKER")
 
+function checkOffside()
+    local player = game.Players.LocalPlayer.Character.HumanoidRootPart
+    local ball
+    for _, part in ipairs(Workspace:GetDescendants()) do
+        if part:IsA("BasePart") and part.CanCollide == true and part.Transparency == 1 and part.BrickColor == targetColor then
+            ball = part
+            break
+        end
+    end
+    if player.Position.X > ball.Position.X then
+        local playersAhead = 0
+        for _, otherPlayer in ipairs(game.Players:GetPlayers()) do
+            if otherPlayer ~= game.Players.LocalPlayer and otherPlayer.Character.HumanoidRootPart.Position.X > player.Position.X then
+                playersAhead = playersAhead + 1
+            end
+        end
+        if playersAhead < 2 then
+            return true
+        end
+    end
+    return false
+end
+
+
 local Workspace = game:GetService("Workspace")
 local targetColor = BrickColor.new(Color3.fromRGB(237, 234, 234))
 local speed = 16
@@ -99,6 +123,26 @@ w2:Button(
     "Reset Character",
     function()
         game.Players.LocalPlayer.Character.Humanoid.Health = 0
+    end
+)
+
+
+w2:Button(
+    "Check Offside (Buggy)",
+    function()
+        if checkOffside() then
+            game.StarterGui:SetCore("SendNotification", {
+                Title = "Offside!";
+                Text = "You are offside.";
+                Duration = 5;
+            })
+        else
+            game.StarterGui:SetCore("SendNotification", {
+                Title = "Not Offside";
+                Text = "You are not offside.";
+                Duration = 5;
+            })
+        end
     end
 )
 
