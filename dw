@@ -46,27 +46,31 @@ w1:Button(
     end
 )
 
-local w2 = library:Window("RF24 | MISC")
-
 local targetColor = BrickColor.new(Color3.fromRGB(237, 234, 234))
 
-local footSize = 1  -- Default foot size
-
-w2:Toggle(
-    "Reach",
-    "ApplySize",
+w1:Toggle(
+    "Foot Size",
+    "FootSize",
     false,
     function(toggled)
         local rightFoot = game.Players.LocalPlayer.Character:FindFirstChild("RightFoot")
         if toggled and rightFoot then
-            rightFoot.Size = Vector3.new(footSize, footSize, footSize)
-            for i,v in pairs(Workspace:GetDescendants()) do
-                if v:IsA("BasePart") and v.CanCollide == true and v.Transparency == 1 and v.BrickColor == targetColor then
-                    rightFoot.CanCollide = true
-                else
-                    rightFoot.CanCollide = false
+            w1:Slider(
+                "Size",
+                "Size",
+                1,
+                10,
+                function(value)
+                    rightFoot.Size = Vector3.new(value, value, value)
+                    for i,v in pairs(Workspace:GetDescendants()) do
+                        if v:IsA("BasePart") and v.CanCollide == true and v.Transparency == 1 and v.BrickColor == targetColor then
+                            rightFoot.CanCollide = true
+                        else
+                            rightFoot.CanCollide = false
+                        end
+                    end
                 end
-            end
+            )
         elseif rightFoot then
             rightFoot.Size = Vector3.new(1, 1, 1)  -- Reset to original size
             rightFoot.CanCollide = true
@@ -74,20 +78,10 @@ w2:Toggle(
     end
 )
 
-w2:Slider(
-    "Radius",
-    "FootSize",
-    1,
-    10,
-    function(value)
-        footSize = value
-    end
-)
-
 local UserInputService = game:GetService("UserInputService")
 local ctrlTPEnabled = false
 
-w2:Toggle(
+w1:Toggle(
     "Ctrl+TP",
     "CtrlTP",
     false,
@@ -103,7 +97,7 @@ UserInputService.InputBegan:Connect(function(input)
     end
 end)
 
-w2:Slider(
+w1:Slider(
     "Speed",
     "WS",
     16,
@@ -114,7 +108,7 @@ w2:Slider(
     end
 )
 
-w2:Slider(
+w1:Slider(
     "FOV",
     "FOV",
     0,
