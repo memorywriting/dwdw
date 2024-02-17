@@ -11,29 +11,18 @@ function findBall()
     return nil
 end
 
-function checkOffside()
-    local player = game.Players.LocalPlayer.Character.HumanoidRootPart
-    local ball
-    for _, part in ipairs(Workspace:GetDescendants()) do
-        if part:IsA("BasePart") and part.CanCollide == true and part.Transparency == 1 and part.BrickColor == targetColor then
-            ball = part
-            break
-        end
-    end
-    if player.Position.X > ball.Position.X then
-        local playersAhead = 0
-        for _, otherPlayer in ipairs(game.Players:GetPlayers()) do
-            if otherPlayer ~= game.Players.LocalPlayer and otherPlayer.Character.HumanoidRootPart.Position.X > player.Position.X then
-                playersAhead = playersAhead + 1
-            end
-        end
-        if playersAhead < 2 then
-            return true
-        end
-    end
-    return false
-end
+local lockOnBall = false
 
+function lockOn()
+    while lockOnBall do
+        local ball = findBall()
+        local player = game.Players.LocalPlayer.Character
+        if ball and player then
+            player.HumanoidRootPart.CFrame = ball.CFrame * CFrame.new(0, 0, -5)  -- Position behind the ball
+        end
+        wait(0.1)  -- Wait a short time to reduce lag
+    end
+end
 
 local Workspace = game:GetService("Workspace")
 local targetColor = BrickColor.new(Color3.fromRGB(237, 234, 234))
@@ -104,17 +93,9 @@ w1:Toggle(
     "LockOnBall",
     false,
     function(toggled)
-        local player = game.Players.LocalPlayer.Character.HumanoidRootPart
-        local bodyPos = Instance.new("BodyPosition")
-        bodyPos.Parent = player
-        bodyPos.maxForce = Vector3.new(math.huge, math.huge, math.huge)
-        if toggled then
-            local ball = findBall()
-            if ball then
-                bodyPos.Position = ball.Position + Vector3.new(0, 0, -5)  -- Position behind the ball
-            end
-        else
-            bodyPos:Remove()  -- Remove the BodyPosition when the toggle is turned off
+        lockOnBall = toggled
+        if lockOnBall then
+            lockOn()
         end
     end
 )
@@ -154,25 +135,6 @@ w2:Button(
     end
 )
 
-
-w2:Button(
-    "Check Offside (Buggy)",
-    function()
-        if checkOffside() then
-            game.StarterGui:SetCore("SendNotification", {
-                Title = "Offside!";
-                Text = "You are offside.";
-                Duration = 5;
-            })
-        else
-            game.StarterGui:SetCore("SendNotification", {
-                Title = "Not Offside";
-                Text = "You are not offside.";
-                Duration = 5;
-            })
-        end
-    end
-)
 
 w2:Slider(
     "Speed",
