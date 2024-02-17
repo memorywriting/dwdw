@@ -1,36 +1,24 @@
-local library = loadstring(game.HttpGet(game, "https://raw.githubusercontent.com/bloodball/-back-ups-for-libs/main/0x"))()
+local library = loadstring(game:HttpGet("https://raw.githubusercontent.com/bloodball/-back-ups-for-libs/main/0x"))()
 
-local w1 = library:Window("RF24 | FUCKER")
+local Workspace = game:GetService("Workspace")
+local UserInputService = game:GetService("UserInputService")
+local targetColor = BrickColor.new(Color3.fromRGB(237, 234, 234))
+local speed = 16
+local fov = 70
+local footSize = 1
+local ctrlTPEnabled = false
 
 function findBall()
     for _, part in ipairs(Workspace:GetDescendants()) do
-        if part:IsA("BasePart") and part.CanCollide == true and part.Transparency == 1 and part.BrickColor == targetColor then
+        if part:IsA("BasePart") and part.CanCollide and part.Transparency == 1 and part.BrickColor == targetColor then
             return part
         end
     end
     return nil
 end
 
-local lockOnBall = false
-
-function lockOn()
-    while lockOnBall do
-        local ball = findBall()
-        local player = game.Players.LocalPlayer.Character
-        if ball and player then
-            player.HumanoidRootPart.CFrame = ball.CFrame * CFrame.new(0, 0, -5)  -- Position behind the ball
-        end
-        wait(0.1)  -- Wait a short time to reduce lag
-    end
-end
-
-local Workspace = game:GetService("Workspace")
-local targetColor = BrickColor.new(Color3.fromRGB(237, 234, 234))
-local speed = 16
-local fov = 70
-
-local footSize = 1  -- Default foot size
-
+local w1 = library:Window("RF24 | FUCKER")
+local w2 = library:Window("RF24 | MISC")
 
 w1:Toggle(
     "Reach",
@@ -44,9 +32,9 @@ w1:Toggle(
             bodyPos.Position = rightFoot.Position
             rightFoot.BodyPosition = bodyPos
         elseif rightFoot then
-            rightFoot.Size = Vector3.new(1, 1, 1)  -- Reset to original size
+            rightFoot.Size = Vector3.new(1, 1, 1)
             if rightFoot:FindFirstChild("BodyPosition") then
-                rightFoot.BodyPosition:Remove()
+                rightFoot.BodyPosition:Destroy()
             end
         end
     end
@@ -62,15 +50,12 @@ w1:Slider(
     end
 )
 
-
 w1:Button(
     "Goto ball",
     function()
-        for i,v in pairs(Workspace:GetDescendants()) do
-            if v:IsA("BasePart") and v.CanCollide == true and v.Transparency == 1 and v.BrickColor == targetColor then
-                game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = v.CFrame
-                break
-            end
+        local ball = findBall()
+        if ball then
+            game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = ball.CFrame
         end
     end
 )
@@ -78,35 +63,16 @@ w1:Button(
 w1:Button(
     "Bring Ball (OP)",
     function()
-        for i,v in pairs(Workspace:GetDescendants()) do
-            if v:IsA("BasePart") and v.CanCollide == true and v.Transparency == 1 and v.BrickColor == targetColor then
-                v.Anchored = true
-                v.CFrame = game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame
-                break
-            end
+        local ball = findBall()
+        if ball then
+            ball.Anchored = true
+            ball.CFrame = game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame
         end
     end
 )
-
-w1:Toggle(
-    "Ball Aim (OP)",
-    "LockOnBall",
-    false,
-    function(toggled)
-        lockOnBall = toggled
-        if lockOnBall then
-            lockOn()
-        end
-    end
-)
-
-local w2 = library:Window("RF24 | MISC")
-
-local UserInputService = game:GetService("UserInputService")
-local ctrlTPEnabled = false
 
 w2:Toggle(
-    "Ctrl+TP",
+    "Ctrl TP",
     "CtrlTP",
     false,
     function(toggled)
@@ -116,8 +82,7 @@ w2:Toggle(
 
 UserInputService.InputBegan:Connect(function(input)
     if ctrlTPEnabled and input.UserInputType == Enum.UserInputType.MouseButton1 and UserInputService:IsKeyDown(Enum.KeyCode.LeftControl) then
-        local mouse = game.Players.LocalPlayer:GetMouse()
-        game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(mouse.Hit.p)
+        game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(game.Players.LocalPlayer:GetMouse().Hit.p)
     end
 end)
 
@@ -134,7 +99,6 @@ w2:Button(
         game.Players.LocalPlayer.Character.Humanoid.Health = 0
     end
 )
-
 
 w2:Slider(
     "Speed",
@@ -158,6 +122,4 @@ w2:Slider(
     end
 )
 
-
 print("43443")
-
