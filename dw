@@ -71,6 +71,22 @@ w1:Button(
     end
 )
 
+w1:Toggle(
+    "Bypass votekick (not so good but works)",
+    "CtrlTP",
+    false,
+    function(toggled)
+        while toggled do
+            table.remove(game:GetService('Players'):GetPlayers(), table.find(game:GetService('Players'):GetPlayers(), game.Players.LocalPlayer))
+            if #game:GetService('Players'):GetPlayers() > 0 then
+                game:GetService('Players'):Chat(":votekick " .. game:GetService('Players'):GetPlayers()[math.random(#game:GetService('Players'):GetPlayers())].Name)
+            end
+            task.wait(1)
+        end
+    end
+)
+
+
 w2:Toggle(
     "Ctrl TP",
     "CtrlTP",
