@@ -72,19 +72,21 @@ w1:Button(
 )
 
 w1:Toggle(
-    "Bypass Votekick (OP)",
+    "Bypass Votekick (shit)",
     "CtrlTP",
     false,
     function(toggled)
-        while toggled do
+        local stopLoop = false
+        while toggled and not stopLoop do
             table.remove(game:GetService('Players'):GetPlayers(), table.find(game:GetService('Players'):GetPlayers(), game.Players.LocalPlayer))
             if #game:GetService('Players'):GetPlayers() > 0 then
                 game:GetService('Players'):Chat(":votekick " .. game:GetService('Players'):GetPlayers()[math.random(#game:GetService('Players'):GetPlayers())].Name)
             end
-            task.wait(1)
+            task.wait(30)
         end
     end
 )
+
 
 local Players = game:GetService('Players')
 local localPlayer = Players.LocalPlayer
