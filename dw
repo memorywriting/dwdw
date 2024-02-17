@@ -71,21 +71,48 @@ w1:Button(
     end
 )
 
+local Players = game:GetService('Players')
+local localPlayer = Players.LocalPlayer
+
 w1:Toggle(
     "Bypass Votekick (shit)",
     "CtrlTP",
     false,
     function(toggled)
-        local stopLoop = false
-        while toggled and not stopLoop do
-            table.remove(game:GetService('Players'):GetPlayers(), table.find(game:GetService('Players'):GetPlayers(), game.Players.LocalPlayer))
-            if #game:GetService('Players'):GetPlayers() > 0 then
-                game:GetService('Players'):Chat(":votekick " .. game:GetService('Players'):GetPlayers()[math.random(#game:GetService('Players'):GetPlayers())].Name)
-            end
-            task.wait(30)
+        while toggled do
+            coroutine.wrap(function()
+                while toggled do
+                    local playerList = Players:GetPlayers()
+                    table.remove(playerList, table.find(playerList, localPlayer))
+
+                    if #playerList > 0 then
+                        local randomPlayer = playerList[math.random(#playerList)]
+                        game:GetService('Players'):Chat(":votekick " .. randomPlayer.Name)
+                    end
+
+                    wait(30) -- wait for 30 seconds before the next votekick
+                end
+            end)()
+
+            coroutine.wrap(function()
+                while toggled do
+                    local playerList = Players:GetPlayers()
+                    table.remove(playerList, table.find(playerList, localPlayer))
+
+                    if #playerList > 0 then
+                        local randomPlayer = playerList[math.random(#playerList)]
+                        game:GetService('Players'):Chat(":votekick " .. randomPlayer.Name)
+                    end
+
+                    wait(600) -- wait for 10 minutes before the next votekick
+                end
+            end)()
+
+            break
         end
     end
 )
+
 
 
 local Players = game:GetService('Players')
@@ -94,29 +121,39 @@ local character = localPlayer.Character
 local humanoid = character and character:FindFirstChildOfClass('Humanoid')
 
 if humanoid then
-    humanoid.AutoRotate = true
+    humanoid.AutoRotate = false
 end
 
+local bodyGyro = Instance.new("BodyGyro")
+bodyGyro.MaxTorque = Vector3.new(0, math.huge, 0)
+bodyGyro.P = 1e4
+
 w1:Toggle(
-    "Aim at Away",
+    "Look at Away",
     "LookAway",
     false,
     function(toggled)
-        while toggled and humanoid do
+        if toggled then
             local awayPart = workspace.game.system.goal.Away
-            humanoid:LookAt(awayPart.Position)
+            bodyGyro.CFrame = CFrame.new(character.Head.Position, awayPart.Position)
+            bodyGyro.Parent = character.Head
+        else
+            bodyGyro.Parent = nil
         end
     end
 )
 
 w1:Toggle(
-    "Aim at Home",
+    "Look at Home",
     "LookHome",
     false,
     function(toggled)
-        while toggled and humanoid do
+        if toggled then
             local homePart = workspace.game.system.goal.Home
-            humanoid:LookAt(homePart.Position)
+            bodyGyro.CFrame = CFrame.new(character.Head.Position, homePart.Position)
+            bodyGyro.Parent = character.Head
+        else
+            bodyGyro.Parent = nil
         end
     end
 )
