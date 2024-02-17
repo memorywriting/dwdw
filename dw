@@ -86,6 +86,38 @@ w1:Toggle(
     end
 )
 
+local Players = game:GetService('Players')
+local localPlayer = Players.LocalPlayer
+local character = localPlayer.Character
+local humanoid = character and character:FindFirstChildOfClass('Humanoid')
+
+if humanoid then
+    humanoid.AutoRotate = true
+end
+
+w1:Toggle(
+    "Aim at Away",
+    "LookAway",
+    false,
+    function(toggled)
+        while toggled and humanoid do
+            local awayPart = workspace.game.system.goal.Away
+            humanoid:LookAt(awayPart.Position)
+        end
+    end
+)
+
+w1:Toggle(
+    "Aim at Home",
+    "LookHome",
+    false,
+    function(toggled)
+        while toggled and humanoid do
+            local homePart = workspace.game.system.goal.Home
+            humanoid:LookAt(homePart.Position)
+        end
+    end
+)
 
 w2:Toggle(
     "Ctrl TP",
