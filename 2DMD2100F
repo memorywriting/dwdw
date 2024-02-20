@@ -1259,7 +1259,8 @@ playerTab:AddToggle({
 	Color = Color3.fromRGB(255,255,255),
 	Increment = 1,
 	Callback = function(Value)
-        local setspeed = value
+if Value then
+        local setspeed = Value
 
         local WalkSpeedSpoof = getgenv().WalkSpeedSpoof
         local Disable = WalkSpeedSpoof and WalkSpeedSpoof.Disable
@@ -1270,7 +1271,7 @@ playerTab:AddToggle({
         local cloneref = cloneref or function(...)
             return ...
         end
-
+    end
         local WalkSpeedSpoof = {}
 
         local Players = cloneref(game:GetService("Players"))
@@ -1422,3 +1423,88 @@ playerTab:AddToggle({
         end
     end
 })
+
+farmingTab:AddToggle({
+	Name = "Auto Break",
+	getgenv().autoSwing,
+	Callback = function(t)
+        getgenv().autoSwing = t
+        spawn(function()
+        game:GetService("RunService").RenderStepped:Connect(function()
+        if getgenv().autoSwing then
+           for i,v in pairs(game:GetService("Workspace").Resources:GetChildren()) do
+              if v ~= nil and v.Name ~= "Barley" and v.Name ~= "Corn" and v.PrimaryPart ~= nil and (game:GetService("Players").LocalPlayer.Character.HumanoidRootPart.Position - v.PrimaryPart.Position).magnitude < 10 then
+                 local attackTable = {
+                    [1] = v.PrimaryPart
+                 }
+                 game:GetService("ReplicatedStorage").Events.SwingTool:FireServer(attackTable)
+              end
+           end
+        end
+        end)
+        end)
+        end,
+     })
+
+     _G.pickupRadius = 10 -- Initialize _G.pickupRadius
+
+_G.AutoPickUpItems = function()
+    spawn(
+        function()
+            while _G.autopickupitems do
+                wait()
+                pcall(
+                    function()
+                        local n = game:GetService("Players").LocalPlayer.Character.HumanoidRootPart
+                        local o = game:GetService("ReplicatedStorage")
+                        for b, c in pairs(game:GetService("Workspace"):GetChildren()) do
+                            if
+                                c:FindFirstChild("Pickup") and c:IsA("BasePart") or
+                                    c:IsA("UnionOpreation")
+                             then
+                                if (n.Position - c.Position).Magnitude < _G.pickupRadius then -- Use _G.pickupRadius for the pickup radius
+                                    game:GetService("ReplicatedStorage").Events.Pickup:FireServer(c)
+                                end
+                            end
+                        end
+                        for b, c in pairs(game:GetService("Workspace").Items:GetChildren()) do
+                            if
+                                c:FindFirstChild("Pickup") and c:IsA("BasePart") or
+                                    c:IsA("UnionOpreation")
+                             then
+                                if (n.Position - c.Position).Magnitude < _G.pickupRadius then -- Use _G.pickupRadius for the pickup radius
+                                    game:GetService("ReplicatedStorage").Events.Pickup:FireServer(c)
+                                end
+                            end
+                        end
+                    end
+                )
+            end
+        end
+    )
+end
+
+farmingTab:AddToggle({
+	Name = "Auto Pickup",
+	Default = false,
+	Callback = function(Value)
+        _G.autopickupitems = Value
+        if Value then 
+            _G.AutoPickUpItems()
+        end
+    end,
+ })
+
+ farmingTab:AddSlider({
+	Name = "Slider",
+	Min = 0,
+	Max = 25,
+	_G.pickupRadius,
+	Color = Color3.fromRGB(255,255,255),
+	Increment = 1,
+	Callback = function(Value)
+		_G.pickupRadius = Value 
+	end,
+})
+
+OrionLib:Init()
