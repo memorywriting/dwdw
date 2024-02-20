@@ -352,7 +352,31 @@ for _,v in next, getconnections(game:GetService("LogService").MessageOut) do
     game:GetService("TeleportService"):Teleport(11729688377)
  end
  
- 
+ local isEspEnabled = false
+
+local function enableEsp()
+    isEspEnabled = true
+    while isEspEnabled do
+        for _, model in pairs(game.Workspace.Hearts:GetDescendants()) do
+            if model:IsA("Model") and not model:FindFirstChild("ESP") then
+                createBillboardAndLabel(model)
+            end
+        end
+        wait(1)
+    end
+end
+
+local function disableEsp()
+    isEspEnabled = false
+    for _, model in pairs(game.Workspace.Hearts:GetDescendants()) do
+        local esp = model:FindFirstChild("ESP")
+        if esp then
+            esp:Destroy()
+        end
+    end
+end
+
+
  -- Get the 'Workspace' service
  local Workspace = game:GetService("Workspace")
  
@@ -1511,3 +1535,15 @@ farmingTab:AddToggle({
 })
 
 OrionLib:Init()
+
+espTab:AddToggle({
+    Name = "Heart Esp",
+    Default = false,
+    Callback = function(Value)
+        if Value then
+            enableEsp()
+        else
+            disableEsp()
+        end
+    end
+})
