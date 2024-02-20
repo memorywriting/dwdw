@@ -1425,26 +1425,29 @@ if Value then
 })
 
 farmingTab:AddToggle({
-	Name = "Auto Break",
-	getgenv().autoSwing,
-	Callback = function(t)
+    Name = "Auto Break",
+    Default = getgenv().autoSwing,
+    Callback = function(t)
         getgenv().autoSwing = t
-        spawn(function()
-        game:GetService("RunService").RenderStepped:Connect(function()
-        if getgenv().autoSwing then
-           for i,v in pairs(game:GetService("Workspace").Resources:GetChildren()) do
-              if v ~= nil and v.Name ~= "Barley" and v.Name ~= "Corn" and v.PrimaryPart ~= nil and (game:GetService("Players").LocalPlayer.Character.HumanoidRootPart.Position - v.PrimaryPart.Position).magnitude < 10 then
-                 local attackTable = {
-                    [1] = v.PrimaryPart
-                 }
-                 game:GetService("ReplicatedStorage").Events.SwingTool:FireServer(attackTable)
-              end
-           end
+    end,
+})
+
+game:GetService("RunService").RenderStepped:Connect(function()
+    if getgenv().autoSwing then
+        for i,v in pairs(game:GetService("Workspace").Resources:GetChildren()) do
+            if v and v.Name ~= "Barley" and v.Name ~= "Corn" and v.PrimaryPart then
+                local distance = (game.Players.LocalPlayer.Character.HumanoidRootPart.Position - v.PrimaryPart.Position).magnitude
+                if distance < 10 then
+                    local attackTable = {
+                        [1] = v.PrimaryPart
+                    }
+                    game:GetService("ReplicatedStorage").Events.SwingTool:FireServer(attackTable)
+                end
+            end
         end
-        end)
-        end)
-        end,
-     })
+    end
+end)
+
 
      _G.pickupRadius = 10 -- Initialize _G.pickupRadius
 
