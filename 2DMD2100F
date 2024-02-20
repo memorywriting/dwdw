@@ -1577,38 +1577,51 @@ farmingTab:AddToggle({
 })
 
 local RunService, Workspace, camera = game:GetService("RunService"), game:GetService("Workspace"), game.Workspace.CurrentCamera
-local textbox
+local connections = {}
+
+local function createESP(v)
+    local textbox = Drawing.new("Text")
+    textbox.Text = v.Name
+    textbox.Color = Color3.fromRGB(255, 105, 180)
+    textbox.Outline = true
+    textbox.OutlineColor = Color3.new(0, 0, 0)
+    textbox.Size = 15
+    textbox.Center = true
+
+    local connection = RunService.RenderStepped:Connect(function()
+        local pos = camera:WorldToViewportPoint(v.Part.Position)
+        textbox.Position = Vector2.new(pos.X, pos.Y + 1)
+        textbox.Visible = pos.Z > 0
+    end)
+
+    return textbox, connection
+end
+
+local function clearESP()
+    for _, v in pairs(connections) do
+        v[1]:Remove()
+        v[2]:Disconnect()
+    end
+    connections = {}
+end
 
 espTab:AddToggle({
-	Name = "Heart ESP",
-	Default = false,
-	Callback = function(Value)
-		if Value then
-			for i, v in pairs(Workspace.Hearts:GetChildren()) do
-				if v:IsA("Model") and v:FindFirstChild("Part") then
-					textbox = Drawing.new("Text")
-					textbox.Text = v.Name
-					textbox.Color = Color3.fromRGB(219, 66, 66)
-					textbox.Outline = true
-					textbox.OutlineColor = Color3.new(0, 0, 0)
-					textbox.Size = 15
-					textbox.Center = true
-
-					RunService.RenderStepped:Connect(function()
-						local pos = camera:WorldToViewportPoint(v.Part.Position)
-						textbox.Position = Vector2.new(pos.X, pos.Y + 1)
-						textbox.Visible = pos.Z > 0
-					end)
-				end
-			end
-		else
-			if textbox then
-				textbox:Remove()
-				textbox = nil
-			end
-		end
-	end
+    Name = "Heart ESP",
+    Default = false,
+    Callback = function(Value)
+        if Value then
+            for i, v in pairs(Workspace.Hearts:GetChildren()) do
+                if v:IsA("Model") and v:FindFirstChild("Part") then
+                    local textbox, connection = createESP(v)
+                    table.insert(connections, {textbox, connection})
+                end
+            end
+        else
+            clearESP()
+        end
+    end
 })
+
 
 
 OrionLib:Init()
