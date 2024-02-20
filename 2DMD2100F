@@ -351,31 +351,6 @@ for _,v in next, getconnections(game:GetService("LogService").MessageOut) do
  local function tpMain()
     game:GetService("TeleportService"):Teleport(11729688377)
  end
- 
- local isEspEnabled = false
-
-local function enableEsp()
-    isEspEnabled = true
-    while isEspEnabled do
-        for _, model in pairs(game.Workspace.Hearts:GetDescendants()) do
-            if model:IsA("Model") and not model:FindFirstChild("ESP") then
-                createBillboardAndLabel(model)
-            end
-        end
-        wait(1)
-    end
-end
-
-local function disableEsp()
-    isEspEnabled = false
-    for _, model in pairs(game.Workspace.Hearts:GetDescendants()) do
-        local esp = model:FindFirstChild("ESP")
-        if esp then
-            esp:Destroy()
-        end
-    end
-end
-
 
  -- Get the 'Workspace' service
  local Workspace = game:GetService("Workspace")
@@ -620,6 +595,75 @@ end
     end
  end
  
+ local function heartEsp()
+    local billboardGui = Instance.new("BillboardGui")
+    billboardGui.Name = "Heart BG"
+    billboardGui.Active = false
+    billboardGui.AlwaysOnTop = true
+    billboardGui.Brightness = 1
+    billboardGui.DistanceLowerLimit = 0
+    billboardGui.DistanceStep = 0
+    billboardGui.DistanceUpperLimit = -1
+    billboardGui.Enabled = true
+    billboardGui.ExtentsOffset = Vector3.new(0, 0, 0)
+    billboardGui.LightInfluence = 0
+    billboardGui.MaxDistance = inf
+    billboardGui.ResetOnSpawn = false
+    billboardGui.Size = UDim2.new(0, 10, 0, 10)
+    billboardGui.SizeOffset = Vector2.new(0, 0)
+    billboardGui.AutoLocalize = true
+ 
+    local textLabel = Instance.new("TextLabel")
+    textLabel.Active = false
+    textLabel.AnchorPoint = Vector2.new(0, 0)
+    textLabel.AutomaticSize = Enum.AutomaticSize.None
+    textLabel.BackgroundTransparency = 1
+    textLabel.BorderSizePixel = 0
+    textLabel.LayoutOrder = 0
+    textLabel.Name = "TextLabel"
+    textLabel.Position = UDim2.new(0, 0, 0, 0)
+    textLabel.Rotation = 0
+    textLabel.Size = UDim2.new(0.5, 0.5, 0.5, 0.5)
+    textLabel.Visible = true
+    textLabel.ZIndex = 1
+    textLabel.LineHeight = 1
+    textLabel.MaxVisibleGraphemes = -1
+    textLabel.RichText = false
+    textLabel.Text = "Heart Node"
+    textLabel.TextColor3 = Color3.new(1, 0, 0)
+    textLabel.TextSize = 15
+    textLabel.TextScaled = false
+    textLabel.AutoLocalize = false
+ 
+    local function createBillboardAndLabel(model)
+       local clonedBillboardGui = billboardGui:Clone()
+       clonedBillboardGui.Parent = model
+ 
+       local clonedTextLabel = textLabel:Clone()
+       clonedTextLabel.Parent = clonedBillboardGui
+    end
+ 
+    while _G.HeartEsp do
+       wait(1)
+ 
+       if not _G.HeartEsp then
+          for _, model in pairs(game.Workspace.Resources:GetChildren()) do
+             local heartBgs = model:FindFirstChild("Heart BG")
+             if heartBgs then
+                heartBgs:Destroy()
+             end
+          end
+       else
+          for _, model in pairs(game.Workspace.Hearts:GetChildren()) do
+             if string.sub(model.Name, 1, 5) == "Heart" and not model:FindFirstChild("Heart BG") then
+                createBillboardAndLabel(model)
+             end
+          end
+       end
+    end
+end
+
+
  local function aduriteEsp()
     local billboardGui = Instance.new("BillboardGui")
     billboardGui.Name = "Adurite BG"
@@ -1540,10 +1584,7 @@ espTab:AddToggle({
     Name = "Heart Esp",
     Default = false,
     Callback = function(Value)
-        if Value then
-            enableEsp()
-        else
-            disableEsp()
-        end
-    end
+            _G.HeartEsp = Value
+            heartEsp()
+        end,
 })
