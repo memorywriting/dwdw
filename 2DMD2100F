@@ -1,0 +1,1807 @@
+for _,v in next, getconnections(game:GetService("LogService").MessageOut) do
+    v:Disable()
+ end
+ for _,v in next, getconnections(game:GetService("ScriptContext").Error) do
+    v:Disable()
+ end
+ 
+ local Players = game:GetService("Players")
+ local plr = Players.LocalPlayer
+ 
+ if plr then
+    for i,v in pairs(plr.Character:GetChildren()) do
+       if v:IsA("LocalScript") and v.Name ~= "Animate" and v.Name ~= "PartyBillboard" and v.Name ~= "SpawnColorChanger" then
+          v:Destroy()
+       end
+    end
+ end
+ 
+ local UNIATTEMPT = true
+ local UIS = game:GetService("UserInputService")
+ 
+ _G.MountainClimber = false
+ _G.Speeder = false
+ _G.LogBreakAura = false
+ _G.OreBreakAura = false
+ _G.Detection = false
+ 
+ _G.GoldEsp = false
+ _G.AduriteEsp = false
+ _G.CrystalLodeEsp = false
+ _G.IronNodeEsp = false
+ _G.MeteorRockEsp = false
+ _G.CrystalMeteorRockEsp = false
+ 
+ 
+ local function GroupDetect()
+    local player = game.Players.LocalPlayer
+    local IDList = {1669567577, 300411622,  3333755037, 14921263, 623162005, 1308829163, 98002074, 4424327548, 436941963, 1925708573, 3552348976, 3323146867, 115122707, 4063747505, 3125360375, 94604520, 497623768, 1981993741, 503118072, 250143751, 1106395777, 461787425, 1217631755, 2930085196, 1378597258, 1515615413, 385307945, 946430143, 139190326, 740727479, 1497173687, 355732892, 406112510, 3485337395, 194067424, 52827750, 3325882377, 3392307522, 3450943869, 3414918338, 159413166, 1192166679, 725751368, 2520211653}
+    while _G.Detection do
+       if player and player.Character then
+          local userId = player.userId
+          for _, id in ipairs(IDList) do
+             if userId == id then
+                game.Players.LocalPlayer:Kick("Admin Detected")
+             end
+          end
+       end
+       wait(5)
+    end
+ end
+ 
+ local function Mount()
+    local player = game.Players.LocalPlayer
+    while true do
+       local humanoidWC = player.Character and player.Character:FindFirstChildOfClass("Humanoid")
+       if _G.MountainClimber then
+          if humanoidWC and humanoidWC.Health > 0 then
+             humanoidWC.MaxSlopeAngle = 89.9
+          else
+             wait(1)
+          end
+       else
+          if humanoidWC then
+             humanoidWC.MaxSlopeAngle = 46
+          end
+          break
+       end
+       Wait()
+    end
+ end
+ 
+ getgenv().killing = false
+ getgenv().killing2 = false
+ getgenv().killAuraRange = 20
+ 
+ local function isAlive(plr)
+    local plr = plr or game:GetService("Players").LocalPlayer
+    if plr and plr.Character and ((plr.Character:FindFirstChild("Humanoid")) and (plr.Character:FindFirstChild("Humanoid") and plr.Character:FindFirstChild("Humanoid").Health > 0) and (plr.Character:FindFirstChild("HumanoidRootPart")) and (plr.Character:FindFirstChild("Head"))) then
+       return true
+    end
+ end
+ 
+ local function canBeTargeted(plr, doTeamCheck)
+    if isAlive(plr) and plr ~= game:GetService("Players").LocalPlayer and (doTeamCheck and plr.Team ~= game:GetService("Players").LocalPlayer.Team or not doTeamCheck) and plr.Name ~= "valensoysantijajaja" and plr.Name ~= "SusLordCV" then
+       return true
+    end
+    return false
+ end
+ 
+ local function useAura()
+    spawn(function()
+    game:GetService("RunService").RenderStepped:Connect(function()
+    if getgenv().killing or getgenv().killing2 then
+       for i, v in pairs(game:GetService("Players"):GetPlayers()) do
+          if isAlive() and canBeTargeted(v, false) and (game:GetService("Players").LocalPlayer.Character.HumanoidRootPart.Position - v.Character.HumanoidRootPart.Position).magnitude < getgenv().killAuraRange then
+             local attackTable = {
+                [1] = game:GetService("Workspace")[v.Name].HumanoidRootPart,
+             }
+             game:GetService("ReplicatedStorage").Events.SwingTool:FireServer(attackTable)
+          end
+       end
+    end
+    end)
+    end)
+ end
+ 
+ local States = {
+     AutoAim = true,
+ }
+ local lockedPlayer = nil
+ local Mouse = game.Players.LocalPlayer:GetMouse()
+ local RunService = game:GetService("RunService")
+ local Root = game.Players.LocalPlayer.Character.HumanoidRootPart
+ local RootPos, MousePos
+ 
+ function findNearestPlayer()
+     local nearestPlayer
+     local shortestDistance = math.huge
+     for _, player in ipairs(game:GetService("Players"):GetPlayers()) do
+         if player ~= game.Players.LocalPlayer then
+             local character = player.Character
+             local humanoidRootPart = character and character:FindFirstChild("HumanoidRootPart")
+             if humanoidRootPart then
+                 local distance = (Root.Position - humanoidRootPart.Position).Magnitude
+                 if distance < shortestDistance then
+                     shortestDistance = distance
+                     nearestPlayer = humanoidRootPart
+                 end
+             end
+         end
+     end
+     return nearestPlayer
+ end
+ 
+ RunService.RenderStepped:Connect(function()
+     if getgenv().killing2 and Root then
+         lockedPlayer = findNearestPlayer()
+         if lockedPlayer then 
+             RootPos, MousePos = Root.Position, lockedPlayer.Position - lockedPlayer.CFrame.LookVector * 0.03 
+             pcall(function() 
+                 if MousePos then 
+                     Root.CFrame = CFrame.new(RootPos, Vector3.new(MousePos.X, RootPos.Y, MousePos.Z)) 
+                 end 
+             end) 
+         end 
+     end 
+ end)
+ 
+ task.spawn(function()
+     while true do 
+         task.wait() 
+         pcall(function() 
+             if getgenv().killing2 and lockedPlayer then 
+                 if MousePos and RootPos then 
+                     if MousePos then 
+                         Root.CFrame = MousePos.CFrame*CFrame.new(0,0,3) 
+                         pcall(function() 
+                             game:GetService("Players").LocalPlayer.Character:FindFirstChildOfClass("Tool"):Activate() 
+                         end) 
+                     end 
+                 end 
+             end 
+         end) 
+     end 
+ end)
+ 
+ _G.af = {} -- Initialize _G.af
+ 
+ _G.Speeder = function()
+     if game.PlaceId == 10767870749 then
+         speederup = 24
+     else
+         speederup = 17
+     end
+     spawn(
+         function()
+             _G.ae = true
+             function speedup()
+                 if game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character.Humanoid then
+                     game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = speederup
+                 end
+             end
+             _G.af.WalkSpeedChanger =
+                 _G.af.WalkSpeedChanger and _G.af.WalkSpeedChanger:Disconnect() and false or
+                 game.Players.LocalPlayer.Character:WaitForChild("Humanoid"):GetPropertyChangedSignal(
+                     "WalkSpeed"
+                 ):Connect(speedup)
+             _G.af.WalkSpeedAlawys =
+                 _G.af.WalkSpeedAlawys and _G.af.WalkSpeedAlawys:Disconnect() and false or
+                 game.Players.LocalPlayer.CharacterAdded:Connect(
+                     function()
+                         _G.af.WalkSpeedChanger =
+                             _G.af.WalkSpeedChanger and _G.af.WalkSpeedChanger:Disconnect() and false or
+                             game.Players.LocalPlayer.Character:WaitForChild("Humanoid"):GetPropertyChangedSignal(
+                                 "WalkSpeed"
+                             ):Connect(speedup)
+                         speedup()
+                     end
+                 )
+             speedup()
+             while task.wait() do
+                 if not _G.ae then
+                     _G.af.WalkSpeedChanger =
+                         _G.af.WalkSpeedChanger and _G.af.WalkSpeedChanger:Disconnect() and false or nil
+                     _G.af.WalkSpeedAlawys = _G.af.WalkSpeedAlawys and _G.af.WalkSpeedAlawys:Disconnect() and false or nil
+                     game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = 16
+                     return
+                 end
+             end
+         end
+     )
+ end
+ 
+ function Speeder()
+     if game.PlaceId == 10767870749 then
+         speederup = 24
+     else
+         speederup = 17
+     end
+     spawn(
+         function()
+             ae = true
+             function speedup()
+                 if game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character.Humanoid then
+                     game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = speederup
+                 end
+             end
+             af.WalkSpeedChanger =
+                 af.WalkSpeedChanger and af.WalkSpeedChanger:Disconnect() and false or
+                 game.Players.LocalPlayer.Character:WaitForChild("Humanoid"):GetPropertyChangedSignal(
+                     "WalkSpeed"
+                 ):Connect(speedup)
+             af.WalkSpeedAlawys =
+                 af.WalkSpeedAlawys and af.WalkSpeedAlawys:Disconnect() and false or
+                 game.Players.LocalPlayer.CharacterAdded:Connect(
+                     function()
+                         af.WalkSpeedChanger =
+                             af.WalkSpeedChanger and af.WalkSpeedChanger:Disconnect() and false or
+                             game.Players.LocalPlayer.Character:WaitForChild("Humanoid"):GetPropertyChangedSignal(
+                                 "WalkSpeed"
+                             ):Connect(speedup)
+                         speedup()
+                     end
+                 )
+             speedup()
+             while task.wait() do
+                 if not ae then
+                     af.WalkSpeedChanger =
+                         af.WalkSpeedChanger and af.WalkSpeedChanger:Disconnect() and false or nil
+                     af.WalkSpeedAlawys = af.WalkSpeedAlawys and af.WalkSpeedAlawys:Disconnect() and false or nil
+                     game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = 16
+                     return
+                 end
+             end
+         end
+     )
+ end
+ 
+ local function LogBreakAura()
+    while _G.LogBreakAura do
+       task.wait()
+       for _, v in ipairs(workspace.Resources:GetChildren()) do
+          if v:IsA("Model") and game.Players.LocalPlayer:DistanceFromCharacter(v:GetModelCFrame().Position) < 20 then
+             local trunk = v:FindFirstChild("Trunk")
+             local reference = v:FindFirstChild("Reference")
+             local stump = v:FindFirstChild("Stump")
+             local leaves = v:FindFirstChild("Leaves")
+             local foliage = v:FindFirstChild("Foliage")
+             local union = v:FindFirstChild("Union")
+ 
+             local validTrees = {
+                ["Small Tree"] = {trunk, reference},
+                ["Dead Tree"] = {trunk, reference, trunk},
+                ["Driftwood"] = {trunk, trunk, reference},
+                ["Feather Tree"] = {reference, trunk},
+                ["Swoll Tree"] = {trunk, reference},
+                ["Sun Tree"] = {reference, trunk},
+                ["Ancient Tree"] = {trunk, reference},
+                ["Dave"] = {leaves, stump}
+             }
+ 
+             local validBushes = {
+                ["Feather Bush"] = {stump, leaves},
+                ["Sun Shrub"] = {leaves, stump},
+                ["Bush"] = {stump, leaves},
+                ["Petrified Bush"] = {stump, leaves},
+                ["Big Bush"] = {foliage, reference, stump, foliage, union}
+             }
+ 
+             if validTrees[v.Name] then
+                game:GetService("ReplicatedStorage").Events.SwingTool:FireServer(validTrees[v.Name])
+             elseif validBushes[v.Name] then
+                game:GetService("ReplicatedStorage").Events.SwingTool:FireServer(validBushes[v.Name])
+             end
+ 
+             task.wait()
+          end
+       end
+    end
+ end
+ 
+ local function OreBreaker()
+    while _G.OreBreakAura do
+       task.wait()
+       for _, v in ipairs(workspace.Resources:GetChildren()) do
+          if v:IsA("Model") and game.Players.LocalPlayer:DistanceFromCharacter(v:GetModelCFrame().Position) < 20 then
+             local smallRock = v:FindFirstChild("Small Rock")
+             local reference = v:FindFirstChild("Reference")
+             local largeRock = v:FindFirstChild("Large Rock")
+             local stone = v:FindFirstChild("Stone")
+             local rawMagnetite = v:FindFirstChild("Raw Magnetite")
+             local crystalBit = v:FindFirstChild("Crystal Bit")
+             local ice = v:FindFirstChild("Ice")
+             local foliage = v:FindFirstChild("Foliage")
+             local union = v:FindFirstChild("Union")
+ 
+             local validOres = {
+                ["Big Rock"] = {largeRock},
+                ["Small Rock"] = {smallRock},
+                ["Stone Node"] = {smallRock, reference},
+                ["Gold Node"] = {reference, smallRock},
+                ["Iron Node"] = {smallRock, reference},
+                ["Adurite Node"] = {smallRock, reference},
+                ["Adurite Rich Rock"] = {smallRock, reference},
+                ["Crystal Lode"] = {stone, reference},
+                ["Emerald Lode"] = {stone, stone, reference},
+                ["Feather Stone"] = {foliage, reference},
+                ["Ice Mound"] = {smallRock},
+                ["Ice Chunk"] = {ice, reference},
+                ["Iceberg"] = {ice, reference},
+                ["Meteor Rock"] = {rawMagnetite, smallRock},
+                ["Crystal Meteor Rock"] = {crystalBit, smallRock},
+                ["Coal Node"] = {smallRock}
+             }
+ 
+             if validOres[v.Name] then
+                game:GetService("ReplicatedStorage").Events.SwingTool:FireServer(validOres[v.Name])
+             end
+ 
+             task.wait()
+          end
+       end
+    end
+ end
+ 
+ 
+ local function tpVoid()
+    game:GetService("TeleportService"):Teleport(11879754496)
+ end
+ 
+ local function tpMain()
+    game:GetService("TeleportService"):Teleport(11729688377)
+ end
+ 
+ 
+ -- Get the 'Workspace' service
+ local Workspace = game:GetService("Workspace")
+ 
+ -- Check if the 'Items' folder exists in the Workspace
+ local ItemsFolder = Workspace:FindFirstChild("Items")
+ if not ItemsFolder then
+     error("Could not find an 'Items' folder in the Workspace.")
+ end
+ 
+ -- Function to create a BillboardGui for a part or model
+ local function createBillboard(object)
+     local billboardGui = Instance.new("BillboardGui")
+     billboardGui.Name = object.Name .. " GUI"
+     billboardGui.Adornee = object
+     billboardGui.Size = UDim2.new(0, 100, 0, 50)
+     billboardGui.StudsOffset = Vector3.new(0, 2, 0)
+     billboardGui.AlwaysOnTop = true
+ 
+     local textLabel = Instance.new("TextLabel")
+     textLabel.Size = UDim2.new(1, 0, 1, 0)
+     textLabel.Text = object.Name
+     textLabel.BackgroundTransparency = 1 -- No background
+     textLabel.TextColor3 = Color3.new(1, 1, 1) -- White text
+     textLabel.TextSize = 30 -- Increased text size
+     textLabel.Parent = billboardGui
+ 
+     billboardGui.Parent = object
+ end
+ 
+ -- Function to remove all BillboardGuis
+ local function removeAllBillboards()
+     for _, object in pairs(ItemsFolder:GetChildren()) do
+         if object:FindFirstChildWhichIsA("BillboardGui") then
+             object:FindFirstChildWhichIsA("BillboardGui"):Destroy()
+         end
+     end
+ end
+ 
+ -- Function to toggle ESP on and off
+ local function toggleESP()
+     if _G.allitems10 then
+         removeAllBillboards()
+     else
+         for _, object in ipairs(ItemsFolder:GetChildren()) do
+             if object:IsA("BasePart") or object:IsA("Model") then
+                 createBillboard(object)
+             end
+         end 
+     end 
+     _G.allitems10 = not _G.allitems10
+ end
+ 
+ local function allitems()
+     local billboardGui = Instance.new("BillboardGui")
+     billboardGui.Name = "allitems BG"
+     billboardGui.Active = false
+     billboardGui.AlwaysOnTop = true
+     billboardGui.Brightness = 1
+     billboardGui.DistanceLowerLimit = 0
+     billboardGui.DistanceStep = 0
+     billboardGui.DistanceUpperLimit = -1
+     billboardGui.Enabled = true
+     billboardGui.ExtentsOffset = Vector3.new(0, 0, 0)
+     billboardGui.LightInfluence = 0
+     billboardGui.MaxDistance = math.huge
+     billboardGui.ResetOnSpawn = false
+     billboardGui.Size = UDim2.new(0, 10, 0, 10)
+     billboardGui.SizeOffset = Vector2.new(0, 0)
+     billboardGui.AutoLocalize = true
+ 
+     local textLabel = Instance.new("TextLabel")
+     textLabel.Active = false
+     textLabel.AnchorPoint = Vector2.new(0, 0)
+     textLabel.AutomaticSize = Enum.AutomaticSize.None
+     textLabel.BackgroundTransparency = 1
+     textLabel.BorderSizePixel = 0
+     textLabel.LayoutOrder = 0
+     textLabel.Name = "TextLabel"
+     textLabel.Position = UDim2.new(0, 0, 0, 0)
+     textLabel.Rotation = 0
+     textLabel.Size = UDim2.new(0.5, 0.5, 0.5, 0.5)
+     textLabel.Visible = true
+     textLabel.ZIndex = 1
+     textLabel.LineHeight = 1
+     textLabel.MaxVisibleGraphemes = -1
+     textLabel.RichText = false
+     textLabel.TextColor3 = Color3.new(1, 1, 1) -- White text
+     textLabel.TextSize = 15
+     textLabel.TextScaled = false
+     textLabel.AutoLocalize = false
+ 
+     local clonedBillboardGui = billboardGui:Clone()
+     clonedBillboardGui.Parent = model
+     
+     local clonedTextLabel = textLabel:Clone()
+     clonedTextLabel.Parent = clonedBillboardGui
+ 
+ end
+ 
+ while _G.allitems10 do
+    wait(1)
+ 
+    if not _G.allitems10 then
+        for _, object in pairs(game.Workspace.Items:GetChildren()) do
+            local allitemsBgs = object:FindFirstChild("allitems BG")
+            if allitemsBgs then
+                allitemsBgs:Destroy()
+            end
+        end
+    else
+        for _, object in pairs(game.Workspace.Items:GetChildren()) do
+            if (object:IsA("Model") or object:IsA("BasePart")) and not object:FindFirstChild("Gold BG") then
+                createBillboardAndLabel(object)
+            end
+        end 
+    end 
+ end 
+ 
+ -- Get the 'Players' service
+ local Players = game:GetService("Players")
+ 
+ -- Function to create a BillboardGui for a player
+ local function createBillboard(player)
+     local character = player.Character
+     if character then
+         local humanoidRootPart = character:FindFirstChild("HumanoidRootPart")
+         if humanoidRootPart then
+             local billboardGui = Instance.new("BillboardGui")
+             billboardGui.Name = player.Name .. " GUI"
+             billboardGui.Adornee = humanoidRootPart
+             billboardGui.Size = UDim2.new(0, 100, 0, 50)
+             billboardGui.StudsOffset = Vector3.new(0, 2, 0)
+             billboardGui.AlwaysOnTop = true
+ 
+             local textLabel = Instance.new("TextLabel")
+             textLabel.Size = UDim2.new(1, 0, 1, 0)
+             textLabel.Text = player.Name
+             textLabel.BackgroundTransparency = 1 -- No background
+             textLabel.TextColor3 = Color3.new(1, 1, 1) -- White text
+             textLabel.TextSize = 30 -- Increased text size
+             textLabel.Parent = billboardGui
+ 
+             billboardGui.Parent = humanoidRootPart
+         end
+     end
+ end
+ 
+ -- Function to remove all BillboardGuis from a player
+ local function removeBillboard(player)
+     local character = player.Character
+     if character then
+         local humanoidRootPart = character:FindFirstChild("HumanoidRootPart")
+         if humanoidRootPart then
+             local billboardGui = humanoidRootPart:FindFirstChild(player.Name .. " GUI")
+             if billboardGui then
+                 billboardGui:Destroy()
+             end
+         end
+     end
+ end
+ 
+ local function niggersEsp()
+     if _G.playerEsp then
+         for _, player in ipairs(Players:GetPlayers()) do
+             removeBillboard(player)
+         end
+     else
+         for _, player in ipairs(Players:GetPlayers()) do
+             createBillboard(player)
+         end 
+     end 
+     _G.playerEsp = not _G.playerEsp
+ end
+ 
+ 
+ local function goldEsp()
+    local billboardGui = Instance.new("BillboardGui")
+    billboardGui.Name = "Gold BG"
+    billboardGui.Active = false
+    billboardGui.AlwaysOnTop = true
+    billboardGui.Brightness = 1
+    billboardGui.DistanceLowerLimit = 0
+    billboardGui.DistanceStep = 0
+    billboardGui.DistanceUpperLimit = -1
+    billboardGui.Enabled = true
+    billboardGui.ExtentsOffset = Vector3.new(0, 0, 0)
+    billboardGui.LightInfluence = 0
+    billboardGui.MaxDistance = inf
+    billboardGui.ResetOnSpawn = false
+    billboardGui.Size = UDim2.new(0, 10, 0, 10)
+    billboardGui.SizeOffset = Vector2.new(0, 0)
+    billboardGui.AutoLocalize = true
+ 
+    local textLabel = Instance.new("TextLabel")
+    textLabel.Active = false
+    textLabel.AnchorPoint = Vector2.new(0, 0)
+    textLabel.AutomaticSize = Enum.AutomaticSize.None
+    textLabel.BackgroundTransparency = 1
+    textLabel.BorderSizePixel = 0
+    textLabel.LayoutOrder = 0
+    textLabel.Name = "TextLabel"
+    textLabel.Position = UDim2.new(0, 0, 0, 0)
+    textLabel.Rotation = 0
+    textLabel.Size = UDim2.new(0.5, 0.5, 0.5, 0.5)
+    textLabel.Visible = true
+    textLabel.ZIndex = 1
+    textLabel.LineHeight = 1
+    textLabel.MaxVisibleGraphemes = -1
+    textLabel.RichText = false
+    textLabel.Text = "Gold Node"
+    textLabel.TextColor3 = Color3.new(1, 1, 0)
+    textLabel.TextSize = 15
+    textLabel.TextScaled = false
+    textLabel.AutoLocalize = false
+ 
+    local function createBillboardAndLabel(model)
+       local clonedBillboardGui = billboardGui:Clone()
+       clonedBillboardGui.Parent = model
+ 
+       local clonedTextLabel = textLabel:Clone()
+       clonedTextLabel.Parent = clonedBillboardGui
+    end
+ 
+    while _G.GoldEsp do
+       wait(1)
+ 
+       if not _G.GoldEsp then
+          for _, model in pairs(game.Workspace.Resources:GetChildren()) do
+             local goldBgs = model:FindFirstChild("Gold BG")
+             if goldBgs then
+                goldBgs:Destroy()
+             end
+          end
+       else
+          for _, model in pairs(game.Workspace.Resources:GetChildren()) do
+             if model.Name == "Gold Node" and not model:FindFirstChild("Gold BG") then
+                createBillboardAndLabel(model)
+             end
+          end
+       end
+    end
+ end
+ 
+ local function aduriteEsp()
+    local billboardGui = Instance.new("BillboardGui")
+    billboardGui.Name = "Adurite BG"
+    billboardGui.Active = false
+    billboardGui.AlwaysOnTop = true
+    billboardGui.Brightness = 1
+    billboardGui.DistanceLowerLimit = 0
+    billboardGui.DistanceStep = 0
+    billboardGui.DistanceUpperLimit = -1
+    billboardGui.Enabled = true
+    billboardGui.ExtentsOffset = Vector3.new(0, 0, 0)
+    billboardGui.LightInfluence = 0
+    billboardGui.MaxDistance = inf
+    billboardGui.ResetOnSpawn = false
+    billboardGui.Size = UDim2.new(0, 10, 0, 10)
+    billboardGui.SizeOffset = Vector2.new(0, 0)
+    billboardGui.AutoLocalize = true
+ 
+    local textLabel = Instance.new("TextLabel")
+    textLabel.Active = false
+    textLabel.AnchorPoint = Vector2.new(0, 0)
+    textLabel.AutomaticSize = Enum.AutomaticSize.None
+    textLabel.BackgroundTransparency = 1
+    textLabel.BorderSizePixel = 0
+    textLabel.LayoutOrder = 0
+    textLabel.Name = "TextLabel"
+    textLabel.Position = UDim2.new(0, 0, 0, 0)
+    textLabel.Rotation = 0
+    textLabel.Size = UDim2.new(0.5, 0.5, 0.5, 0.5)
+    textLabel.Visible = true
+    textLabel.ZIndex = 1
+    textLabel.LineHeight = 1
+    textLabel.MaxVisibleGraphemes = -1
+    textLabel.RichText = false
+    textLabel.Text = "Adurite Node"
+    textLabel.TextColor3 = Color3.new(103/255, 0, 0)
+    textLabel.TextSize = 15
+    textLabel.TextScaled = false
+    textLabel.AutoLocalize = false
+ 
+    local function createBillboardAndLabel(model)
+       local clonedBillboardGui = billboardGui:Clone()
+       clonedBillboardGui.Parent = model
+ 
+       local clonedTextLabel = textLabel:Clone()
+       clonedTextLabel.Parent = clonedBillboardGui
+    end
+ 
+    while _G.AduriteEsp do
+       wait(1)
+ 
+       if not _G.AduriteEsp then
+          for _, model in pairs(game.Workspace.Resources:GetChildren()) do
+             local aduriteBgs = model:FindFirstChild("Adurite BG")
+             if aduriteBgs then
+                aduriteBgs:Destroy()
+             end
+          end
+       else
+          for _, model in pairs(game.Workspace.Resources:GetChildren()) do
+             if (model.Name == "Adurite Node" or model.Name == "Adurite Rich Rock") and not model:FindFirstChild("Adurite BG") then
+                createBillboardAndLabel(model)
+             end
+          end
+       end
+    end
+ end
+ 
+ local function crystallodeEsp()
+    local billboardGui = Instance.new("BillboardGui")
+    billboardGui.Name = "Crystal Lode BG"
+    billboardGui.Active = false
+    billboardGui.AlwaysOnTop = true
+    billboardGui.Brightness = 1
+    billboardGui.DistanceLowerLimit = 0
+    billboardGui.DistanceStep = 0
+    billboardGui.DistanceUpperLimit = -1
+    billboardGui.Enabled = true
+    billboardGui.ExtentsOffset = Vector3.new(0, 0, 0)
+    billboardGui.LightInfluence = 0
+    billboardGui.MaxDistance = inf
+    billboardGui.ResetOnSpawn = false
+    billboardGui.Size = UDim2.new(0, 10, 0, 10)
+    billboardGui.SizeOffset = Vector2.new(0, 0)
+    billboardGui.AutoLocalize = true
+ 
+    local textLabel = Instance.new("TextLabel")
+    textLabel.Active = false
+    textLabel.AnchorPoint = Vector2.new(0, 0)
+    textLabel.AutomaticSize = Enum.AutomaticSize.None
+    textLabel.BackgroundTransparency = 1
+    textLabel.BorderSizePixel = 0
+    textLabel.LayoutOrder = 0
+    textLabel.Name = "TextLabel"
+    textLabel.Position = UDim2.new(0, 0, 0, 0)
+    textLabel.Rotation = 0
+    textLabel.Size = UDim2.new(0.5, 0.5, 0.5, 0.5)
+    textLabel.Visible = true
+    textLabel.ZIndex = 1
+    textLabel.LineHeight = 1
+    textLabel.MaxVisibleGraphemes = -1
+    textLabel.RichText = false
+    textLabel.Text = "Crystal Lode"
+    textLabel.TextColor3 = Color3.new(176, 241, 244)
+    textLabel.TextSize = 15
+    textLabel.TextScaled = false
+    textLabel.AutoLocalize = false
+ 
+    local function createBillboardAndLabel(model)
+       local clonedBillboardGui = billboardGui:Clone()
+       clonedBillboardGui.Parent = model
+ 
+       local clonedTextLabel = textLabel:Clone()
+       clonedTextLabel.Parent = clonedBillboardGui
+    end
+ 
+    while _G.CrystalLodeEsp do
+       wait(1)
+ 
+       if not _G.CrystalLodeEsp then
+          for _, model in pairs(game.Workspace.Resources:GetChildren()) do
+             local CrystalLodeBgs = model:FindFirstChild("Crystal Lode BG")
+             if CrystalLodeBgs then
+                CrystalLodeBgs:Destroy()
+             end
+          end
+       else
+          for _, model in pairs(game.Workspace.Resources:GetChildren()) do
+             if (model.Name == "Crystal Lode") and not model:FindFirstChild("Crystal Lode BG") then
+                createBillboardAndLabel(model)
+             end
+          end
+       end
+    end
+ end
+ 
+ local function OldGodEsp()
+    local billboardGui = Instance.new("BillboardGui")
+    billboardGui.Name = "Old God BG"
+    billboardGui.Active = false
+    billboardGui.AlwaysOnTop = true
+    billboardGui.Brightness = 1
+    billboardGui.DistanceLowerLimit = 0
+    billboardGui.DistanceStep = 0
+    billboardGui.DistanceUpperLimit = -1
+    billboardGui.Enabled = true
+    billboardGui.ExtentsOffset = Vector3.new(0, 0, 0)
+    billboardGui.LightInfluence = 0
+    billboardGui.MaxDistance = inf
+    billboardGui.ResetOnSpawn = false
+    billboardGui.Size = UDim2.new(0, 10, 0, 10)
+    billboardGui.SizeOffset = Vector2.new(0, 0)
+    billboardGui.AutoLocalize = true
+ 
+    local textLabel = Instance.new("TextLabel")
+    textLabel.Active = false
+    textLabel.AnchorPoint = Vector2.new(0, 0)
+    textLabel.AutomaticSize = Enum.AutomaticSize.None
+    textLabel.BackgroundTransparency = 1
+    textLabel.BorderSizePixel = 0
+    textLabel.LayoutOrder = 0
+    textLabel.Name = "TextLabel"
+    textLabel.Position = UDim2.new(0, 0, 0, 0)
+    textLabel.Rotation = 0
+    textLabel.Size = UDim2.new(0.5, 0.5, 0.5, 0.5)
+    textLabel.Visible = true
+    textLabel.ZIndex = 1
+    textLabel.LineHeight = 1
+    textLabel.MaxVisibleGraphemes = -1
+    textLabel.RichText = false
+    textLabel.Text = "Old God"
+    textLabel.TextColor3 = Color3.new(176, 241, 244)
+    textLabel.TextSize = 15
+    textLabel.TextScaled = false
+    textLabel.AutoLocalize = false
+ 
+    local function createBillboardAndLabel(model)
+       local clonedBillboardGui = billboardGui:Clone()
+       clonedBillboardGui.Parent = model
+ 
+       local clonedTextLabel = textLabel:Clone()
+       clonedTextLabel.Parent = clonedBillboardGui
+    end
+ 
+    while _G.OldGodEsp do
+       wait(1)
+ 
+       if not _G.OldGodEsp then
+          for _, model in pairs(game.Workspace.Resources:GetChildren()) do
+             local OldGodBgs = model:FindFirstChild("Old God BG")
+             if OldGodBgs then
+                OldGodBgs:Destroy()
+             end
+          end
+       else
+          for _, model in pairs(game.Workspace.Resources:GetChildren()) do
+             if (model.Name == "Old God") and not model:FindFirstChild("Old God BG") then
+                createBillboardAndLabel(model)
+             end
+          end
+       end
+    end
+ end
+ 
+ local function ironnodeEsp()
+    local billboardGui = Instance.new("BillboardGui")
+    billboardGui.Name = "Iron Node BG"
+    billboardGui.Active = false
+    billboardGui.AlwaysOnTop = true
+    billboardGui.Brightness = 1
+    billboardGui.DistanceLowerLimit = 0
+    billboardGui.DistanceStep = 0
+    billboardGui.DistanceUpperLimit = -1
+    billboardGui.Enabled = true
+    billboardGui.ExtentsOffset = Vector3.new(0, 0, 0)
+    billboardGui.LightInfluence = 0
+    billboardGui.MaxDistance = inf
+    billboardGui.ResetOnSpawn = false
+    billboardGui.Size = UDim2.new(0, 10, 0, 10)
+    billboardGui.SizeOffset = Vector2.new(0, 0)
+    billboardGui.AutoLocalize = true
+ 
+    local textLabel = Instance.new("TextLabel")
+    textLabel.Active = false
+    textLabel.AnchorPoint = Vector2.new(0, 0)
+    textLabel.AutomaticSize = Enum.AutomaticSize.None
+    textLabel.BackgroundTransparency = 1
+    textLabel.BorderSizePixel = 0
+    textLabel.LayoutOrder = 0
+    textLabel.Name = "TextLabel"
+    textLabel.Position = UDim2.new(0, 0, 0, 0)
+    textLabel.Rotation = 0
+    textLabel.Size = UDim2.new(0.5, 0.5, 0.5, 0.5)
+    textLabel.Visible = true
+    textLabel.ZIndex = 1
+    textLabel.LineHeight = 1
+    textLabel.MaxVisibleGraphemes = -1
+    textLabel.RichText = false
+    textLabel.Text = "Iron Node"
+    textLabel.TextColor3 = Color3.new(160, 95, 53)
+    textLabel.TextSize = 15
+    textLabel.TextScaled = false
+    textLabel.AutoLocalize = false
+ 
+    local function createBillboardAndLabel(model)
+       local clonedBillboardGui = billboardGui:Clone()
+       clonedBillboardGui.Parent = model
+ 
+       local clonedTextLabel = textLabel:Clone()
+       clonedTextLabel.Parent = clonedBillboardGui
+    end
+ 
+    while _G.IronNodeEsp do
+       wait(1)
+ 
+       if not _G.IronNodeEsp then
+          for _, model in pairs(game.Workspace.Resources:GetChildren()) do
+             local IronNodeBgs = model:FindFirstChild("Iron Node BG")
+             if IronNodeBgs then
+                IronNodeBgs:Destroy()
+             end
+          end
+       else
+          for _, model in pairs(game.Workspace.Resources:GetChildren()) do
+             if (model.Name == "Iron Node") and not model:FindFirstChild("Iron Node BG") then
+                createBillboardAndLabel(model)
+             end
+          end
+       end
+    end
+ end
+ 
+ local function meteorrockEsp()
+    local billboardGui = Instance.new("BillboardGui")
+    billboardGui.Name = "Meteor Rock BG"
+    billboardGui.Active = false
+    billboardGui.AlwaysOnTop = true
+    billboardGui.Brightness = 1
+    billboardGui.DistanceLowerLimit = 0
+    billboardGui.DistanceStep = 0
+    billboardGui.DistanceUpperLimit = -1
+    billboardGui.Enabled = true
+    billboardGui.ExtentsOffset = Vector3.new(0, 0, 0)
+    billboardGui.LightInfluence = 0
+    billboardGui.MaxDistance = inf
+    billboardGui.ResetOnSpawn = false
+    billboardGui.Size = UDim2.new(0, 10, 0, 10)
+    billboardGui.SizeOffset = Vector2.new(0, 0)
+    billboardGui.AutoLocalize = true
+ 
+    local textLabel = Instance.new("TextLabel")
+    textLabel.Active = false
+    textLabel.AnchorPoint = Vector2.new(0, 0)
+    textLabel.AutomaticSize = Enum.AutomaticSize.None
+    textLabel.BackgroundTransparency = 1
+    textLabel.BorderSizePixel = 0
+    textLabel.LayoutOrder = 0
+    textLabel.Name = "TextLabel"
+    textLabel.Position = UDim2.new(0, 0, 0, 0)
+    textLabel.Rotation = 0
+    textLabel.Size = UDim2.new(0.5, 0.5, 0.5, 0.5)
+    textLabel.Visible = true
+    textLabel.ZIndex = 1
+    textLabel.LineHeight = 1
+    textLabel.MaxVisibleGraphemes = -1
+    textLabel.RichText = false
+    textLabel.Text = "Raw Magnetite"
+    textLabel.TextColor3 = Color3.new(98, 37, 209)
+    textLabel.TextSize = 15
+    textLabel.TextScaled = false
+    textLabel.AutoLocalize = false
+ 
+    local function createBillboardAndLabel(model)
+       local clonedBillboardGui = billboardGui:Clone()
+       clonedBillboardGui.Parent = model
+ 
+       local clonedTextLabel = textLabel:Clone()
+       clonedTextLabel.Parent = clonedBillboardGui
+    end
+ 
+    while _G.MeteorRockEsp do
+       wait(1)
+ 
+       if not _G.MeteorRockEsp then
+          for _, model in pairs(game.Workspace.Resources:GetChildren()) do
+             local MeteorRockBgs = model:FindFirstChild("Meteor Rock BG")
+             if MeteorRockBgs then
+                MeteorRockBgs:Destroy()
+             end
+          end
+       else
+          for _, model in pairs(game.Workspace.Resources:GetChildren()) do
+             if (model.Name == "Meteor Rock") and not model:FindFirstChild("Meteor Rock BG") then
+                createBillboardAndLabel(model)
+             end
+          end
+       end
+    end
+ end
+ 
+ local function crystalmeteorrockEsp()
+    local billboardGui = Instance.new("BillboardGui")
+    billboardGui.Name = "Crystal Meteor Rock BG"
+    billboardGui.Active = false
+    billboardGui.AlwaysOnTop = true
+    billboardGui.Brightness = 1
+    billboardGui.DistanceLowerLimit = 0
+    billboardGui.DistanceStep = 0
+    billboardGui.DistanceUpperLimit = -1
+    billboardGui.Enabled = true
+    billboardGui.ExtentsOffset = Vector3.new(0, 0, 0)
+    billboardGui.LightInfluence = 0
+    billboardGui.MaxDistance = inf
+    billboardGui.ResetOnSpawn = false
+    billboardGui.Size = UDim2.new(0, 10, 0, 10)
+    billboardGui.SizeOffset = Vector2.new(0, 0)
+    billboardGui.AutoLocalize = true
+ 
+    local textLabel = Instance.new("TextLabel")
+    textLabel.Active = false
+    textLabel.AnchorPoint = Vector2.new(0, 0)
+    textLabel.AutomaticSize = Enum.AutomaticSize.None
+    textLabel.BackgroundTransparency = 1
+    textLabel.BorderSizePixel = 0
+    textLabel.LayoutOrder = 0
+    textLabel.Name = "TextLabel"
+    textLabel.Position = UDim2.new(0, 0, 0, 0)
+    textLabel.Rotation = 0
+    textLabel.Size = UDim2.new(0.5, 0.5, 0.5, 0.5)
+    textLabel.Visible = true
+    textLabel.ZIndex = 1
+    textLabel.LineHeight = 1
+    textLabel.MaxVisibleGraphemes = -1
+    textLabel.RichText = false
+    textLabel.Text = "Crystal"
+    textLabel.TextColor3 = Color3.new(170, 255, 255)
+    textLabel.TextSize = 15
+    textLabel.TextScaled = false
+    textLabel.AutoLocalize = false
+ 
+    local function createBillboardAndLabel(model)
+       local clonedBillboardGui = billboardGui:Clone()
+       clonedBillboardGui.Parent = model
+ 
+       local clonedTextLabel = textLabel:Clone()
+       clonedTextLabel.Parent = clonedBillboardGui
+    end
+ 
+    while _G.CrystalMeteorRockEsp do
+       wait(1)
+ 
+       if not _G.CrystalMeteorRockEsp then
+          for _, model in pairs(game.Workspace:GetChildren()) do
+             local CrystalMeteorRockBgs = model:FindFirstChild("Crystal Meteor Rock BG")
+             if CrystalMeteorRockBgs then
+                CrystalMeteorRockBgs:Destroy()
+             end
+          end
+       else
+          for _, model in pairs(game.Workspace:GetChildren()) do
+             if (model.Name == "Crystal Meteor Rock") and not model:FindFirstChild("Crystal Meteor Rock BG") then
+                createBillboardAndLabel(model)
+             end
+          end
+       end
+    end
+ end
+ 
+ getgenv().killing = false
+ getgenv().killing2 = false
+ getgenv().killAuraRange = 20
+ 
+ local function isAlive(plr)
+    local plr = plr or game:GetService("Players").LocalPlayer
+    if plr and plr.Character and ((plr.Character:FindFirstChild("Humanoid")) and (plr.Character:FindFirstChild("Humanoid") and plr.Character:FindFirstChild("Humanoid").Health > 0) and (plr.Character:FindFirstChild("HumanoidRootPart")) and (plr.Character:FindFirstChild("Head"))) then
+       return true
+    end
+ end
+ 
+ local function canBeTargeted(plr, doTeamCheck)
+    if isAlive(plr) and plr ~= game:GetService("Players").LocalPlayer and (doTeamCheck and plr.Team ~= game:GetService("Players").LocalPlayer.Team or not doTeamCheck) and plr.Name ~= "valensoysantijajaja" and plr.Name ~= "SusLordCV" then
+       return true
+    end
+    return false
+ end
+ 
+ getgenv().killing = false
+ getgenv().killing2 = false
+ getgenv().killAuraRange = 20
+ 
+ local function isAlive(plr)
+    local plr = plr or game:GetService("Players").LocalPlayer
+    if plr and plr.Character and ((plr.Character:FindFirstChild("Humanoid")) and (plr.Character:FindFirstChild("Humanoid") and plr.Character:FindFirstChild("Humanoid").Health > 0) and (plr.Character:FindFirstChild("HumanoidRootPart")) and (plr.Character:FindFirstChild("Head"))) then
+       return true
+    end
+ end
+ 
+ local function canBeTargeted(plr, doTeamCheck)
+    if isAlive(plr) and plr ~= game:GetService("Players").LocalPlayer and (doTeamCheck and plr.Team ~= game:GetService("Players").LocalPlayer.Team or not doTeamCheck) and plr.Name ~= "valensoysantijajaja" and plr.Name ~= "SusLordCV" then
+       return true
+    end
+    return false
+ end
+ 
+ local function useAura()
+    spawn(function()
+    game:GetService("RunService").RenderStepped:Connect(function()
+    if getgenv().killing or getgenv().killing2 then
+       for i, v in pairs(game:GetService("Players"):GetPlayers()) do
+          if isAlive() and canBeTargeted(v, false) and (game:GetService("Players").LocalPlayer.Character.HumanoidRootPart.Position - v.Character.HumanoidRootPart.Position).magnitude < getgenv().killAuraRange then
+             local attackTable = {
+                [1] = game:GetService("Workspace")[v.Name].HumanoidRootPart,
+             }
+             game:GetService("ReplicatedStorage").Events.SwingTool:FireServer(attackTable)
+          end
+       end
+    end
+    end)
+    end)
+ end
+ 
+ local States = {
+     AutoAim = true,
+ }
+ local lockedPlayer = nil
+ local Mouse = game.Players.LocalPlayer:GetMouse()
+ local RunService = game:GetService("RunService")
+ local Root = game.Players.LocalPlayer.Character.HumanoidRootPart
+ local RootPos, MousePos
+ 
+ function findNearestPlayer()
+     local nearestPlayer
+     local shortestDistance = math.huge
+     for _, player in ipairs(game:GetService("Players"):GetPlayers()) do
+         if player ~= game.Players.LocalPlayer then
+             local character = player.Character
+             local humanoidRootPart = character and character:FindFirstChild("HumanoidRootPart")
+             if humanoidRootPart then
+                 local distance = (Root.Position - humanoidRootPart.Position).Magnitude
+                 if distance < shortestDistance then
+                     shortestDistance = distance
+                     nearestPlayer = humanoidRootPart
+                 end
+             end
+         end
+     end
+     return nearestPlayer
+ end
+ 
+ RunService.RenderStepped:Connect(function()
+     if getgenv().killing2 and Root then
+         lockedPlayer = findNearestPlayer()
+         if lockedPlayer then 
+             RootPos, MousePos = Root.Position, lockedPlayer.Position - lockedPlayer.CFrame.LookVector * 0.03 
+             pcall(function() 
+                 if MousePos then 
+                     Root.CFrame = CFrame.new(RootPos, Vector3.new(MousePos.X, RootPos.Y, MousePos.Z)) 
+                 end 
+             end) 
+         end 
+     end 
+ end)
+ 
+ task.spawn(function()
+     while true do 
+         task.wait() 
+         pcall(function() 
+             if getgenv().killing2 and lockedPlayer then 
+                 if MousePos and RootPos then 
+                     if MousePos then 
+                         Root.CFrame = MousePos.CFrame*CFrame.new(0,0,3) 
+                         pcall(function() 
+                             game:GetService("Players").LocalPlayer.Character:FindFirstChildOfClass("Tool"):Activate() 
+                         end) 
+                     end 
+                 end 
+             end 
+         end) 
+     end 
+ end)
+ 
+ local Admin = {
+         Prefix = ";",
+         Name = "urion.lua",
+         Version = "v1.1"
+ }
+ 
+ function DeltaWait(n)
+     local now = tick()
+     n = n or 0
+     repeat game:GetService("RunService").Heartbeat:Wait()
+     until tick()-now >= n
+     return tick()-now
+ end
+ 
+ function tablefind(tab,el)
+     for index, value in pairs(tab) do
+         if value == el then
+             return index
+         end
+     end
+ end
+ 
+ function createWatermark(watermarkText)
+         local date_table = os.date("*t")
+ 
+ 
+         local monthTable = {
+                 "January",
+                 "February",
+                 "March",
+                 "April",
+                 "May",
+                 "June",
+                 "July",
+                 "August",
+                 "September",
+                 "October",
+                 "November",
+                 "December"
+ 
+         }
+     local ScreenSize = workspace.Camera.ViewportSize
+     local main = Instance.new("ScreenGui")
+     local mainFrame = Instance.new("Frame")
+     local gradient = Instance.new("UIGradient")
+         local watermark = Instance.new("TextLabel")
+ 
+     main.Parent = game.CoreGui
+     main.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+     main.IgnoreGuiInset = true
+ 
+     mainFrame.Name = "mainFrame"
+     mainFrame.Parent = main
+     mainFrame.BackgroundColor3 = Color3.fromRGB(255,255,255)
+     mainFrame.BorderSizePixel = 1
+     mainFrame.BorderColor3 = Color3.fromRGB(0.0,0)
+     mainFrame.ClipsDescendants = false
+     mainFrame.Size = UDim2.new(1,0,.006,0)
+     mainFrame.Position = UDim2.new(0,0,0,0)
+ 
+     gradient.Parent = mainFrame
+     gradient.Transparency = NumberSequence.new{
+         NumberSequenceKeypoint.new(0, 0),
+         NumberSequenceKeypoint.new(.5, 0),
+         NumberSequenceKeypoint.new(1, 0)
+     }
+     local stage1 = Color3.fromRGB(55,177,218) 
+     local stage2 = Color3.fromRGB(201,72,205) 
+     local stage3 = Color3.fromRGB(204,227,53)
+ 
+     gradient.Color = ColorSequence.new{
+         ColorSequenceKeypoint.new(0, stage1),
+         ColorSequenceKeypoint.new(0.5, stage2),
+         ColorSequenceKeypoint.new(1, stage3)
+     }
+ 
+         watermark['Name'] = "watermark"
+         watermark['Parent'] = mainFrame
+         watermark['BackgroundColor3'] = Color3.fromRGB(255,255,255)
+         watermark['BackgroundTransparency'] = 1.000
+         watermark['BorderSizePixel'] = 0
+         watermark['Position'] = UDim2.new(0,0,3,0)
+         watermark['Size'] = UDim2.new(1,1,1,1)
+         watermark['Font'] = Enum['Font'].Code
+         watermark.Text = Admin.Name.." "..Admin.Version .. " | "..game.Players.LocalPlayer.DisplayName.. " | "..monthTable[date_table.month].." "..date_table.day..", "..date_table.year
+         watermark.TextColor3 = Color3.fromRGB(255,255,255)
+         watermark.TextSize = 15.000
+         watermark.TextXAlignment = Enum.TextXAlignment.Center
+         watermark.TextWrapped = true
+     watermark.TextStrokeTransparency = 0
+     watermark.TextStrokeColor3 = Color3.fromRGB(0,0,0)
+ end
+ -- createWatermark()
+ 
+ 
+ local coreGui = game.CoreGui
+ local slideFrame = Instance.new("Frame")
+ local slideGui = Instance.new("ScreenGui")
+ local uil = Instance.new('UIListLayout')
+ 
+ slideGui.Parent = coreGui
+ slideGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+ 
+ slideFrame.Parent = slideGui
+ slideFrame.BackgroundTransparency = 1
+ slideFrame.BackgroundColor3 = Color3.fromRGB(255,255,255)
+ slideFrame.BorderSizePixel = 0
+ slideFrame.ClipsDescendants = false
+ slideFrame.Size = UDim2.new(.5,0,.5,0)
+ slideFrame.Position = UDim2.new(0.008,0,0.48,0)
+ slideFrame.ClipsDescendants = true
+ 
+ uil.Parent = slideFrame
+ uil.VerticalAlignment = "Bottom"
+ 
+ function Tween(obj, dist, time)
+     local tween = game:GetService("TweenService")
+     local ti = TweenInfo.new(time, Enum.EasingStyle.Quint, Enum.EasingDirection.Out)
+     local tw = tween:Create(obj, ti, dist)
+     tw:Play()
+ end
+ 
+ function Notify(Text, messageType)
+     local notification = Instance.new("Frame")
+     notification.Name = "Notification"
+     notification.Parent = slideFrame
+     notification.BackgroundTransparency = 0.2
+     notification.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+     notification.BorderSizePixel = 0
+     notification.Size = UDim2.new(1, 0, 0.1, 0)
+ 
+     local labelText = Instance.new("TextLabel")
+     labelText.Name = "LabelText"
+     labelText.Parent = notification
+     labelText.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+     labelText.BackgroundTransparency = 1
+     labelText.BorderSizePixel = 0
+     labelText.Position = UDim2.new(0, 10, 0, 0)
+     labelText.Size = UDim2.new(1, -20, 1, 0)
+     labelText.Font = Enum.Font.SourceSans
+     labelText.TextTransparency = 0
+     labelText.Text = Text
+     labelText.TextColor3 = Color3.fromRGB(255, 255, 255)
+     labelText.TextSize = 16
+     labelText.TextWrapped = true
+ 
+     if messageType == 'error' then
+         labelText.Text = "[Error]: "..Text
+         labelText.TextColor3 = Color3.fromRGB(255, 50, 50)
+     else
+         labelText.Text = "[Notification]: "..Text
+         labelText.TextColor3 = Color3.fromRGB(255, 255, 255)
+     end
+ 
+     coroutine.wrap(function()
+         wait(10)
+         local info = TweenInfo.new(1)
+         local tween = game:GetService("TweenService"):Create(notification, info, {BackgroundTransparency = 1})
+         tween:Play()
+         wait(1)
+         notification:Destroy()
+     end)()
+ end
+ 
+ Notify("Loaded! Version: "..Admin.Version)
+ Notify("; to open urion.lua command bar | type cmds")
+ 
+ --//////////////////////////////////////////////////////////////////////////////////////////////////////
+ 
+ local ScreenSize = workspace.Camera.ViewportSize
+ local Be = Instance.new('BlurEffect')
+ Be.Parent = game.Lighting
+ Be.Enabled = false
+ local gui = Instance.new("ScreenGui", game.CoreGui)
+ gui.ResetOnSpawn = false
+ gui.Name = "Command Bar"
+ local Main = Instance.new("Frame", gui)
+ Main.BackgroundTransparency = 1
+ Main.Name = "Main"
+ Main.AnchorPoint = Vector2.new(0.5,0,0.8,0)
+ Main.Position = UDim2.new(0.5,0,0.8,0)
+ Main.Size = UDim2.new(0, 0, 0, ScreenSize.Y/16)
+ local Exec = Instance.new("TextBox", Main)
+ Exec.BackgroundTransparency = 0.4
+ Exec.BorderSizePixel = 0
+ Exec.BackgroundColor3 = Color3.new(0, 0, 0)
+ Exec.BorderColor3 = Color3.new(0, 0, 127)
+ Exec.Name = "Execute"
+ Exec.AnchorPoint = Vector2.new(0.5,0,0.8,0)
+ Exec.Size = UDim2.new(0, 0, 0, ScreenSize.Y/16)
+ Exec.Font = "Legacy"
+ Exec.TextSize = 14
+ Exec.Text = ""
+ Exec.TextColor3 = Color3.new(255, 255, 255)
+ Exec.TextStrokeColor3 = Color3.new(0, 0, 127)
+ Exec.TextStrokeTransparency = 1
+ Exec.TextWrapped = true
+ 
+ -- Create a button
+ local button = Instance.new("TextButton", gui)
+ button.Name = "OpenCommandBox"
+ button.Text = "Open Cmd"
+ button.Size = UDim2.new(0, 100, 0, 50) -- adjust size as needed
+ button.Position = UDim2.new(1, -110, 0, 10) -- position it at the right side of the screen
+ button.BackgroundColor3 = Color3.new(0, 0, 0) -- make the button black
+ button.TextColor3 = Color3.new(1, 1, 1) -- make the text white
+ 
+ -- Make the button draggable
+ button.Active = true
+ button.Draggable = true
+ 
+ -- Add a blur effect to the button
+ local blur = Instance.new("BlurEffect", button)
+ blur.Size = 24
+ 
+ -- Add rounded corners to the button
+ local uiCorner = Instance.new("UICorner", button)
+ uiCorner.CornerRadius = UDim.new(0, 12)
+ 
+ -- Add an aspect ratio constraint to keep the button's proportions consistent
+ local aspectRatioConstraint = Instance.new("UIAspectRatioConstraint", button)
+ aspectRatioConstraint.AspectRatio = 2
+ 
+ -- Parent the GUI to CoreGui
+ gui.Parent = game.CoreGui
+ 
+ -- Function to open the command box
+ local function openCommandBox()
+     Exec:TweenSize(UDim2.new(0, ScreenSize.X/8, 0, ScreenSize.Y/16), Enum.EasingDirection.In, Enum.EasingStyle.Linear, .05)
+     wait(.05)
+     Be.Enabled = true
+     Exec.Text = ""
+     Exec:CaptureFocus()
+ end
+ 
+ -- Connect the button click event to the function
+ button.MouseButton1Click:Connect(openCommandBox)
+ 
+ Exec.FocusLost:connect(function(enterPressed)
+         Exec.Text = ""
+         Exec:TweenSize(UDim2.new(0, 0, 0, ScreenSize.Y/16), Enum.EasingDirection.In, Enum.EasingStyle.Linear, .05)
+         wait(.05)
+         Be.Enabled = false
+ end)
+ 
+ function onKeyPress(actionName, userInputState, inputObject)
+         Exec:TweenSize(UDim2.new(0, ScreenSize.X/8, 0, ScreenSize.Y/16), Enum.EasingDirection.In, Enum.EasingStyle.Linear, .05)
+         wait(.05)
+         Be.Enabled = true
+         Exec.Text = ""
+         Exec:CaptureFocus()
+ end
+ 
+ game.ContextActionService:BindAction("keyPress", onKeyPress,false ,Enum.KeyCode.Semicolon)
+ 
+ 
+ function Chat(Message)
+     wait(.2)
+     game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer(Message,"All")
+ end
+ 
+ function DeltaWait(n)
+     local now = tick()
+     n = n or 0
+     repeat game:GetService("RunService").Heartbeat:Wait()
+     until tick()-now >= n
+     return tick()-now
+ end
+ 
+ --Find player function
+ function findplr(args)
+         if args == "me" then
+                 return LocalPlayer
+         elseif args == "random" then 
+                 return game:GetService("Players"):GetPlayers()[math.random(1, #game:GetService("Players"):GetPlayers())]
+         elseif args == "new" then
+                 local vAges = {} 
+                 for _, v in pairs(game:GetService("Players"):GetPlayers()) do
+                         if v.AccountAge < 30 and v ~= LocalPlayer then
+                                 vAges[#vAges + 1] = v
+                         end
+                 end
+                 return vAges[math.random(1, #vAges)]
+         elseif args == "old" then
+                 local vAges = {} 
+                 for _, v in pairs(game:GetService("Players"):GetPlayers()) do
+                         if v.AccountAge > 30 and v ~= LocalPlayer then
+                                 vAges[#vAges + 1] = v
+                         end
+                 end
+                 return vAges[math.random(1, #vAges)]
+         elseif args == "bacon" then
+                 local vAges = {} 
+                 for _, v in pairs(game:GetService("Players"):GetPlayers()) do
+                         if v.Character:FindFirstChild("Pal Hair") or v.Character:FindFirstChild("Kate Hair") and v ~= LocalPlayer then
+                                 vAges[#vAges + 1] = v
+                         end
+                 end
+                 return vAges[math.random(1, #vAges)]
+         elseif args == "friend" then
+                 local vAges = {} 
+                 for _, v in pairs(game:GetService("Players"):GetPlayers()) do
+                         if v:IsFriendsWith(LocalPlayer.UserId) and v ~= LocalPlayer then
+                                 vAges[#vAges + 1] = v
+                         end
+                 end
+                 return vAges[math.random(1, #vAges)]
+         elseif args == "notfriend" then
+                 local vAges = {} 
+                 for _, v in pairs(game:GetService("Players"):GetPlayers()) do
+                         if not v:IsFriendsWith(LocalPlayer.UserId) and v ~= LocalPlayer then
+                                 vAges[#vAges + 1] = v
+                         end
+                 end
+                 return vAges[math.random(1, #vAges)]
+         elseif args == "ally" then
+                 local vAges = {} 
+                 for _, v in pairs(game:GetService("Players"):GetPlayers()) do
+                         if v.Team == LocalPlayer.Team and v ~= LocalPlayer then
+                                 vAges[#vAges + 1] = v
+                         end
+                 end
+                 return vAges[math.random(1, #vAges)]
+         elseif args == "enemy" then
+                 local vAges = {} 
+                 for _, v in pairs(game:GetService("Players"):GetPlayers()) do
+                         if v.Team ~= LocalPlayer.Team then
+                                 vAges[#vAges + 1] = v
+                         end
+                 end
+                 return vAges[math.random(1, #vAges)]
+         elseif args == "near" then
+                 local vAges = {} 
+                 for _, v in pairs(game:GetService("Players"):GetPlayers()) do
+                         if v ~= LocalPlayer then
+                                 local math = (v.Character:FindFirstChild("HumanoidRootPart").Position - LocalPlayer.Character.HumanoidRootPart.Position).magnitude
+                                 if math < 30 then
+                                         vAges[#vAges + 1] = v
+                                 end
+                         end
+                 end
+                 return vAges[math.random(1, #vAges)]
+         elseif args == "far" then
+                 local vAges = {} 
+                 for _, v in pairs(game:GetService("Players"):GetPlayers()) do
+                         if v ~= LocalPlayer then
+                                 local math = (v.Character:FindFirstChild("HumanoidRootPart").Position - LocalPlayer.Character.HumanoidRootPart.Position).magnitude
+                                 if math > 30 then
+                                         vAges[#vAges + 1] = v
+                                 end
+                         end
+                 end
+                 return vAges[math.random(1, #vAges)]
+         else 
+                 for _, v in pairs(game:GetService("Players"):GetPlayers()) do
+                         if string.find(string.lower(v.Name), string.lower(args)) then
+                                 return 
+                         end
+                 end
+         end
+ end
+ --scd begins here
+ local mt = getrawmetatable(game)
+ local LocalPlayer = game.Players.LocalPlayer
+ local Character = game.Players.LocalPlayer.Character
+ local Workspace = game:GetService("Workspace")
+ 
+ 
+ local hum = game.Players.LocalPlayer.Character
+ local p = game:GetService("Players").LocalPlayer
+ 
+ 
+ function GetPlayer(target)
+         local plrs = game:GetService("Players"):GetPlayers()
+         if target:lower() == "all" then
+                 return plrs
+         elseif target:lower() == "others" then
+                 for index, plr in pairs(plrs) do
+                         if plr == game:GetService("Players").LocalPlayer then
+                                 table.remove(plrs, index)
+                                 return plrs
+                         end
+                 end
+         elseif target:lower() == "me" then
+                 return {
+                         game:GetService("Players").LocalPlayer
+                 }
+         else
+                 local plrTargets = {}
+                 for index, plr in pairs(plrs) do
+                         if plr.Name:sub(1, #target):lower() == target:lower() or plr.DisplayName:sub(1, #target):lower() == target:lower() then
+                                 table.insert(plrTargets, plr)
+                         end
+                 end
+                 return plrTargets
+         end
+ end
+ 
+ 
+ 
+ local Commands = {}
+ function AddCommand(CmdName, func)
+         Commands[CmdName] = CmdName
+         LocalPlayer.Chatted:Connect(function(msg)
+                 msg = msg:lower()
+                 args = msg:split(' ')
+                 if args[1] == Admin.Prefix..CmdName then
+                         
+                         wait()
+                         local success, err = pcall(function()
+                                 coroutine.wrap(function()
+                                         func()
+                                 end)()
+                         end)
+                         if success then
+                                 if args[2] then
+                                         Notify("Executed command: "..CmdName.." "..args[2])
+                                 else
+                                         Notify("Executed command: "..CmdName)
+                                 end
+                         end
+                         if err then
+                                 Notify(err,'error')
+                         end
+                 end
+ 
+         end)
+         Exec.FocusLost:Connect(function(text)
+                 if text then
+                         text = Exec.Text:lower()
+                         args = text:split(' ')
+                         if args[1] == Commands[CmdName] then
+ 
+                                 wait()
+                                 local success, err = pcall(function()
+                                         coroutine.wrap(function()
+                                                 func()
+                                         end)()
+                                 end)
+                                 if success then
+                                         if args[2] then
+                                                 Notify("Executed command: "..CmdName.." "..args[2])
+                                         else
+                                                 Notify("Executed command: "..CmdName)
+                                         end
+                                 end
+                                 if err then
+                                         Notify(err,'error')
+                                 end
+                         end
+                 end
+         end)
+ end
+ function sync(Time)
+         local Objects = game.Players.LocalPlayer.Character:GetDescendants()
+         for I = 1, #Objects do
+                 local Object = Objects[I]
+                 if game.IsA(Object, 'Sound') then
+                         Object.TimePosition = Object.TimePosition + 0.00000000000001
+                 end
+         end    
+ end
+ 
+ 
+ 
+ -- Get the 'Players' service
+ local Players = game:GetService("Players")
+ local LocalPlayer = Players.LocalPlayer
+ 
+ -- Function to create a GUI for a player
+ local function createGUI(player)
+     local gui = Instance.new("ScreenGui")
+     gui.Name = player.Name .. " GUI"
+ 
+     local frame = Instance.new("Frame")
+     frame.Size = UDim2.new(0.2, 0, 0.2, 0) -- Increased size to fit all text
+     frame.Position = UDim2.new(0.4, 0, 0.2, 0) -- Position higher on the screen
+     frame.BackgroundColor3 = Color3.new(1, 1, 1) -- White background
+     frame.BackgroundTransparency = 1 -- Semi-transparent background
+     frame.Draggable = true -- Make the frame draggable
+     frame.Parent = gui
+ 
+     local textLabel = Instance.new("TextLabel")
+     textLabel.Size = UDim2.new(1, 0, 1, 0)
+     textLabel.TextColor3 = Color3.new(0, 0, 0) -- Black text
+     textLabel.BackgroundTransparency = 1 -- No background
+     textLabel.TextSize = 20 -- Large text size
+     textLabel.Font = Enum.Font.SourceSansBold -- Modern-looking font
+     textLabel.Parent = frame
+ 
+     -- Display player information in the GUI
+     textLabel.Text =
+         "Account Age: " .. player.AccountAge .. "\n" ..
+         "Display Name: " .. player.DisplayName .. "\n" ..
+         "Username: " .. player.Name .. "\n" ..
+         "Health: " .. (player.Character and player.Character:FindFirstChild("Humanoid") and player.Character.Humanoid.Health or "N/A")
+ 
+     -- Check if the player has any accessories starting with "god" or "God"
+     local isGod = false
+     for _, accessory in ipairs(player.Character:GetChildren()) do
+         if accessory:IsA("Accessory") and (accessory.Name:sub(1, 3):lower() == "god") then
+             isGod = true
+             break
+         end
+     end
+     textLabel.Text = textLabel.Text .. "\nIs God: " .. tostring(isGod)
+ 
+     gui.Parent = LocalPlayer:WaitForChild("PlayerGui")
+ end
+ 
+ local function removeGUI()
+     for _, gui in pairs(LocalPlayer.PlayerGui:GetChildren()) do
+         if gui.Name:sub(-4) == " GUI" then
+             gui:Destroy()
+         end
+     end
+ end
+ 
+ -- Add commands to view and unview players (replace this with your actual command system)
+ AddCommand("view", function()
+     for _, target in pairs(GetPlayer(args[2])) do
+         Workspace.CurrentCamera.CameraSubject = target.Character
+         createGUI(target)
+     end
+ end)
+ 
+ AddCommand("unview", function()
+     Workspace.CurrentCamera.CameraSubject = LocalPlayer.Character
+     removeGUI(LocalPlayer)
+ end)
+ 
+ 
+ 
+ AddCommand("rj", function()
+     rejoining = true
+     game:GetService('TeleportService'):TeleportToPlaceInstance(game.PlaceId, game.JobId, game:GetService("Players"))
+     wait(3)
+     rejoining = false
+ end)
+ 
+ AddCommand("cmds",function()
+     local coreGui = game.CoreGui
+ local gui = Instance.new("ScreenGui")
+ local mainFrame = Instance.new("Frame")
+ local commandFrame = Instance.new("ScrollingFrame")
+ local bar = Instance.new("Frame")
+ local gradient = Instance.new("UIGradient")
+ local closeButton = Instance.new("ImageButton")
+ 
+ gui.Name = "CustomGui"
+ gui.Parent = coreGui
+ 
+ mainFrame.Name = "MainFrame"
+ mainFrame.Parent = gui
+ mainFrame.ClipsDescendants = true
+ mainFrame.BorderSizePixel = 0
+ mainFrame.BackgroundColor3 = Color3.fromRGB(34, 34, 34)
+ mainFrame.Position = UDim2.new(-1, 0, 0.3, 0)
+ mainFrame.Size = UDim2.new(0.15, 0, 0.4, 0)
+ 
+ commandFrame.Name = "CommandFrame"
+ commandFrame.Parent = mainFrame
+ commandFrame.ClipsDescendants = true
+ commandFrame.Size = UDim2.new(0.89, 0, 0.9, 0)
+ commandFrame.Position = UDim2.new(0.05, 0, 0.05, 0)
+ commandFrame.BorderSizePixel = 0
+ commandFrame.BackgroundColor3 = Color3.fromRGB(16, 16, 16)
+ commandFrame.ScrollBarThickness = 5
+ commandFrame.ScrollBarImageTransparency = 0.5
+ local uil = Instance.new("UIListLayout")
+ uil.Parent = commandFrame
+ 
+ closeButton.Name = "CloseButton"
+ closeButton.Parent = mainFrame
+ closeButton.Size = UDim2.new(0.1, 0, 0.05, 0)
+ closeButton.Position = UDim2.new(0.95, 0, 0, 0)
+ closeButton.BackgroundTransparency = 1
+ closeButton.Image = "rbxassetid://39316767"
+ closeButton.ImageColor3 = Color3.fromRGB(255, 255, 255)
+ 
+ closeButton.MouseButton1Click:Connect(function()
+     mainFrame:TweenPosition(UDim2.new(-1, 0, 0.3, 0), Enum.EasingDirection.In, Enum.EasingStyle.Sine, 0.5)
+     wait(0.5)
+     gui:Destroy()
+ end)
+ 
+ mainFrame:TweenPosition(UDim2.new(0, 0, 0.3, 0), Enum.EasingDirection.In, Enum.EasingStyle.Sine, 0.5)
+ 
+ bar.Name = "Bar"
+ bar.Parent = mainFrame
+ bar.Size = UDim2.new(0.89, 0, 0.005, 0)
+ bar.Position = UDim2.new(0.05, 0, 0.05, 0)
+ 
+ gradient.Parent = bar
+ gradient.Rotation = 90
+ gradient.Transparency = NumberSequence.new{
+     NumberSequenceKeypoint.new(0, 0),
+     NumberSequenceKeypoint.new(0.5, 0),
+     NumberSequenceKeypoint.new(1, 0)
+ }
+ local stage1 = Color3.fromRGB(55, 177, 218)
+ local stage2 = Color3.fromRGB(201, 72, 205)
+ local stage3 = Color3.fromRGB(204, 227, 53)
+ 
+ gradient.Color = ColorSequence.new{
+     ColorSequenceKeypoint.new(0, stage1),
+     ColorSequenceKeypoint.new(0.5, stage2),
+     ColorSequenceKeypoint.new(1, stage3)
+ }
+ 
+ local cmdnum = 0
+ for i, v in pairs(Commands) do
+     local command = Instance.new("TextButton")
+     local uia = Instance.new("UIAspectRatioConstraint")
+     uia.Parent = command
+     uia.AspectRatio = 8
+     command.Name = i
+     command.Parent = commandFrame
+     command.BackgroundColor3 = Color3.fromRGB(41, 41, 41)
+     command.BorderSizePixel = 0
+     command.Size = UDim2.new(1, 0, 0, 50)
+     command.Font = Enum.Font.Code
+     command.Position = UDim2.new(0, 0, 0, 0)
+     command.TextXAlignment = Enum.TextXAlignment.Center
+     command.Text = i
+     command.TextColor3 = Color3.fromRGB(255, 255, 255)
+     command.TextSize = 14.000
+     cmdnum = cmdnum + 1
+ end
+     Notify('Number of commands: '..cmdnum)
+ end)
+
+ local UserInputService = game:GetService('UserInputService')
+ local function isPlayerOnMobile()
+     return UserInputService.TouchEnabled and not (UserInputService.KeyboardEnabled or UserInputService.GamepadEnabled)
+ end
+ 
+ local OrionLib = loadstring(game:HttpGet(('https://raw.githubusercontent.com/shlexware/Orion/main/source')))()
+
+ local Window = OrionLib:MakeWindow({Name = "testtttttt", HidePremium = false, SaveConfig = true, ConfigFolder = "OrionTest"})
+
+ local playerTab  = Window:MakeTab({
+	Name = "Combat/Player 1",
+	Icon = "rbxassetid://4483345998",
+	PremiumOnly = false
+})
+
+local farmingTab  = Window:MakeTab({
+	Name = "Farming",
+	Icon = "rbxassetid://4384400812",
+	PremiumOnly = false
+})
+
+local miscTab  = Window:MakeTab({
+	Name = "Misc",
+	Icon = "rbxassetid://3610247188",
+	PremiumOnly = false
+})
+
+local worldTab  = Window:MakeTab({
+	Name = "World",
+	Icon = "rbxassetid://3610247188",
+	PremiumOnly = false
+})
+
+local espTab  = Window:MakeTab({
+	Name = "Esp",
+	Icon = "rbxassetid://3610247188",
+	PremiumOnly = false
+})
+
+game:GetService("StarterGui"):SetCore("SendNotification", {
+    Title = "Weclome!";
+    Text = "Welcome, " .. players.LocalPlayer.DisplayName;
+    Icon = "rbxthumb://type=AvatarHeadShot&id=" .. players.LocalPlayer.UserId .. "&w=180&h=180 true";
+    Duration = 5
+ })
+
+
+ playerTab:AddToggle({
+    Name = "Kill Aura V1",
+    Default = getgenv().killing,
+    Flag = "KillAuraToggle",
+    Callback = function(Value)
+        getgenv().killing = Value
+        useAura()
+    end
+})
