@@ -10,7 +10,7 @@ local OrionLib = loadstring(game:HttpGet(("https://raw.githubusercontent.com/shl
 local Window =
     OrionLib:MakeWindow(
     {
-        Name = "Hydra | v1.2.1",
+        Name = "hydra | v1.2.1",
         HidePremium = true,
         SaveConfig = true,
         ConfigFolder = "Hydra"
