@@ -437,14 +437,14 @@ local function checkLogs()
         if log.messageType == Enum.MessageType.MessageOutput and not checkedMessages[log.message] then
             local _, _, studs = parseMessage(log.message)
             if studs and studs >= 11 then
-                OrionLib:MakeNotification({Name = "Alert!", Content = log.message, Image = "rbxassetid://4483345998", Time = 5})
+                OrionLib:MakeNotification({Name = "This might be an exploiter", Content = log.message, Image = "rbxassetid://3610247188", Time = 5})
             end
             checkedMessages[log.message] = true
         end
     end
 end
 
-Game:AddToggle({Name = "This is a toggle!", Default = false, Callback = function(Value)
+Game:AddToggle({Name = "Detect Exploiters", Default = false, Callback = function(Value)
     if Value then
         loop = game:GetService("RunService").Heartbeat:Connect(checkLogs)
     else
