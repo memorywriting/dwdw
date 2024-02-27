@@ -1,3 +1,10 @@
+for _,v in next, getconnections(game:GetService("LogService").MessageOut) do
+	v:Disable()
+end
+for _,v in next, getconnections(game:GetService("ScriptContext").Error) do
+	v:Disable()
+end
+
 local OrionLib = loadstring(game:HttpGet(("https://raw.githubusercontent.com/shlexware/Orion/main/source")))()
 
 local Window =
@@ -435,7 +442,7 @@ local function checkLogs()
     for _, log in ipairs(LogService:GetLogHistory()) do
         if log.messageType == Enum.MessageType.MessageOutput and not checkedMessages[log.message] then
             local _, _, studs = parseMessage(log.message)
-            if studs and studs >= 11 then
+            if studs and studs >= 5 then
                 OrionLib:MakeNotification({Name = "This might be an exploiter", Content = log.message, Image = "rbxassetid://3610247188", Time = 5})
             end
             checkedMessages[log.message] = true
