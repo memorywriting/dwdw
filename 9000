@@ -435,26 +435,15 @@ local LogService = game:GetService("LogService")
 local checkedMessages = {}
 
 local function parseMessage(message)
-    local player1, player2, studs = message:match("(%w+) was killed by (%w+) (%d+) studs away.")
-    return player1, player2, tonumber(studs)
+    return message:match("(%w+) was killed by (%w+) (%d+) studs away.")
 end
 
 local function checkLogs()
     for _, log in ipairs(LogService:GetLogHistory()) do
         if log.messageType == Enum.MessageType.MessageOutput and not checkedMessages[log.message] then
-            local player1, _, studs = parseMessage(log.message)
-            local player = game.Players:FindFirstChild(player1)
-            if player and player ~= game.Players.LocalPlayer then
-                local character = player.Character
-                local humanoid = character and character:FindFirstChildOfClass("Humanoid")
-                local humanoidRootPart = character and character:FindFirstChild("HumanoidRootPart")
-                if humanoid and humanoidRootPart then
-                    local speed = humanoid.WalkSpeed
-                    local isOnPlatform = humanoid.FloorMaterial ~= Enum.Material.Air
-                    if (studs and studs >= 11) or speed > 16 or isOnPlatform then
-                        OrionLib:MakeNotification({Name = "This might be an exploiter", Content = log.message, Image = "rbxassetid://4483345998", Time = 5})
-                    end
-                end
+            local _, _, studs = parseMessage(log.message)
+            if studs and studs >= 11 then
+                OrionLib:MakeNotification({Name = "This might be an exploiter", Content = log.message, Image = "rbxassetid://4483345998", Time = 5})
             end
             checkedMessages[log.message] = true
         end
