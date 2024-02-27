@@ -331,6 +331,8 @@ local Character = Window:MakeTab({
     PremiumOnly = false
 })
 
+Character:AddLabel("Teleporting to Worlds will only work in some servers")
+
 Character:AddDropdown({
     Name = "Worlds",
     Default = "Spawn",
