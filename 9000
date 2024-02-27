@@ -435,7 +435,8 @@ local LogService = game:GetService("LogService")
 local checkedMessages = {}
 
 local function parseMessage(message)
-    return message:match("(%w+) was killed by (%w+) (%d+) studs away.")
+    local player1, player2, studs = message:match("(%w+) was killed by (%w+) (%d+) studs away.")
+    return player1, player2, tonumber(studs)
 end
 
 local function checkLogs()
