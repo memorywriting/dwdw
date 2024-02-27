@@ -1,0 +1,331 @@
+
+
+local OrionLib = loadstring(game:HttpGet(("https://raw.githubusercontent.com/shlexware/Orion/main/source")))()
+
+local Window =
+    OrionLib:MakeWindow(
+    {
+        Name = "Hydra | v1.2.1",
+        HidePremium = true,
+        SaveConfig = true,
+        ConfigFolder = "Hydra"
+    }
+)
+
+local Main =
+    Window:MakeTab(
+    {
+        Name = "Main",
+        Icon = "rbxassetid://3610247188",
+        PremiumOnly = false
+    }
+)
+
+function disableConnection(Connection)
+    for i, v in pairs(getconnections(Connection)) do
+        v:Disable()
+    end
+end
+
+function getSword()
+    local character = game.Players.LocalPlayer.Character
+    local backpack = game.Players.LocalPlayer.Backpack
+    local tool = character:FindFirstChildOfClass("Tool")
+    if tool then
+        return tool
+    end
+
+    tool = backpack:FindFirstChildOfClass("Tool")
+    if tool then
+        return tool
+    end
+
+    return nil
+end
+
+local speederup = 17
+
+local function Speeder()
+    if game.PlaceId == 10767870749 then
+        speederup = 24
+    else
+        speederup = 17
+    end
+    spawn(
+        function()
+            ae = true
+            function speedup()
+                if game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character.Humanoid then
+                    game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = speederup
+                end
+            end
+            if not af then
+    af = {}
+end
+
+            af.WalkSpeedChanger =
+                af.WalkSpeedChanger and af.WalkSpeedChanger:Disconnect() and false or
+                game.Players.LocalPlayer.Character:WaitForChild("Humanoid"):GetPropertyChangedSignal(
+                    "WalkSpeed"
+                ):Connect(speedup)
+            af.WalkSpeedAlawys =
+                af.WalkSpeedAlawys and af.WalkSpeedAlawys:Disconnect() and false or
+                game.Players.LocalPlayer.CharacterAdded:Connect(
+                    function()
+                        af.WalkSpeedChanger =
+                            af.WalkSpeedChanger and af.WalkSpeedChanger:Disconnect() and false or
+                            game.Players.LocalPlayer.Character:WaitForChild("Humanoid"):GetPropertyChangedSignal(
+                                "WalkSpeed"
+                            ):Connect(speedup)
+                        speedup()
+                    end
+                )
+            speedup()
+            while task.wait() do
+                if not ae then
+                    af.WalkSpeedChanger =
+                        af.WalkSpeedChanger and af.WalkSpeedChanger:Disconnect() and false or nil
+                    af.WalkSpeedAlawys = af.WalkSpeedAlawys and af.WalkSpeedAlawys:Disconnect() and false or nil
+                    game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = 16
+                    return
+                end
+            end
+        end
+    )
+end
+
+
+local Character = {Spin = false}
+
+function doSpin()
+    Character.Spin = true
+    if not game.Players.LocalPlayer.Character:WaitForChild("HumanoidRootPart"):FindFirstChildOfClass("BodyAngularVelocity") then
+        local Velocity = Instance.new("BodyAngularVelocity", game.Players.LocalPlayer.Character:WaitForChild("HumanoidRootPart"))
+        Velocity.AngularVelocity = Vector3.new(0,15,0)
+        Velocity.MaxTorque = Vector3.new(0,9e9,0)
+        Velocity.P = 1250
+    end
+end
+
+function undoSpin()
+    Character.Spin = false
+    if game.Players.LocalPlayer.Character:WaitForChild("HumanoidRootPart"):FindFirstChildOfClass("BodyAngularVelocity") then
+        game.Players.LocalPlayer.Character:WaitForChild("HumanoidRootPart"):FindFirstChildOfClass("BodyAngularVelocity"):Destroy()
+    end
+end
+
+local g = Instance.new("ScreenGui")
+g.Enabled = false
+local h = Instance.new("TextBox")
+h.Parent = g
+h.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+h.BackgroundTransparency = 1.000
+h.Position = UDim2.new(0.600000024, 0, 0, 0)
+h.Size = UDim2.new(0.400000006, 0, 0.200000003, 0)
+h.Font = Enum.Font.SourceSans
+h.Text = "3.5"
+h.TextColor3 = Color3.fromRGB(0, 0, 255)
+h.TextScaled = true
+h.TextSize = 14.000
+h.TextWrapped = true
+
+g.Parent = game:GetService("CoreGui") 
+
+local autoclick = false
+
+Main:AddToggle({
+    Name = "AutoClick",
+    Default = false,
+    Callback = function(Value)
+        autoclick = Value
+        while autoclick and game.Players.LocalPlayer.Character:FindFirstChild(getSword().Name) do
+            local sword = getSword()
+            if sword then
+                sword:Activate()
+            end
+            wait()
+        end
+    end
+})
+
+local reachToggle =
+    Main:AddToggle(
+    {
+        Name = "Reach",
+        Default = false,
+        Callback = function(Value)
+            a = Value
+        end
+    }
+)
+
+local reachSlider =
+    Main:AddSlider(
+    {
+        Name = "Radius",
+        Min = 0,
+        Max = 25,
+        Default = 3.5,
+        Color = Color3.fromRGB(255, 255, 255),
+        Increment = 0.1,
+        ValueName = "reach",
+        Callback = function(Value)
+            h.Text = tostring(Value)
+        end
+    }
+)
+
+local b = true
+local c = "Sphere"
+local d = true
+local e = true
+local f = Instance.new("Part")
+f.BrickColor = BrickColor.Blue()
+f.Transparency = 0.6
+f.Anchored = true
+f.CanCollide = false
+f.Size = Vector3.new(0.5, 0.5, 0.5)
+f.BottomSurface = Enum.SurfaceType.Smooth
+f.TopSurface = Enum.SurfaceType.Smooth
+g.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+g.DisplayOrder = 999999999
+g.ResetOnSpawn = false
+repeat
+    wait()
+until game.Players.LocalPlayer
+g.Parent = game:GetService("CoreGui")
+game:GetService("UserInputService").InputBegan:connect(
+    function(i, j)
+        if j then
+            return
+        end
+        if i.KeyCode == Enum.KeyCode.R then
+            g.Enabled = not g.Enabled
+        end
+    end
+)
+local k = game.Players.LocalPlayer
+local function l(m, n)
+    local o = m.Parent:FindFirstChildOfClass("Humanoid")
+    if o and o.Parent.Name ~= game.Players.LocalPlayer.Name then
+        if d then
+            for p, q in pairs(m.Parent:GetChildren()) do
+                if q:IsA("Part") then
+                    firetouchinterest(q, n, 0)
+                    firetouchinterest(q, n, 1)
+                end
+            end
+        else
+            firetouchinterest(m, n, 0)
+            firetouchinterest(m, n, 1)
+        end
+    end
+end
+game:GetService("RunService").RenderStepped:connect(
+    function()
+        if not a or not b then
+            return
+        end
+        local r = k.Character and k.Character:FindFirstChildOfClass("Tool")
+        if not r then
+            f.Parent = nil
+        end
+        if r then
+            local n = r:FindFirstChild("Handle") or r:FindFirstChildOfClass("Part")
+            if n then
+                if e then
+                    f.Parent = workspace
+                else
+                    f.Parent = nil
+                end
+                local s = tonumber(h.Text)
+                if s then
+                    if c == "Sphere" then
+                        f.Shape = Enum.PartType.Ball
+                        f.Material = Enum.Material.ForceField
+                        f.Transparency = 0
+                        f.Size = Vector3.new(s, s, s)
+                        f.CFrame = n.CFrame
+                        for p, q in pairs(game.Players:GetPlayers()) do
+                            local t = q.Character and q.Character:FindFirstChild("HumanoidRootPart")
+                            if t and n then
+                                local u = (t.Position - n.Position).magnitude
+                                if u <= s then
+                                    l(t, n)
+                                end
+                            end
+                        end
+                    end
+                end
+            end
+        end
+    end
+)
+
+local Character = Window:MakeTab({
+    Name = "Character",
+    Icon = "rbxassetid://3610247188",
+    PremiumOnly = false
+})
+
+Character:AddToggle({
+    Name = "Spin",
+    Default = false,
+    Callback = function(Value)
+        if Value then
+            doSpin()
+        else
+            undoSpin()
+        end
+    end
+})
+
+local function bypassWalkSpeed()
+    if getgenv().executed then
+        print("Already Bypassed - Applying Settings Changes")
+        if not getgenv().Enabled then
+            return
+        end
+    else
+        getgenv().executed = true
+        print("Bypassed")
+
+        local mt = getrawmetatable(game)
+        setreadonly(mt, false)
+
+        local oldindex = mt.__index
+        mt.__index = newcclosure(function(self, b)
+            if b == 'WalkSpeed' then
+                return 16
+            end
+            return oldindex(self, b)
+        end)
+    end
+end
+
+bypassWalkSpeed()
+
+game.Players.LocalPlayer.CharacterAdded:Connect(function(char)
+    bypassWalkSpeed()
+    char:WaitForChild("Humanoid").WalkSpeed = getgenv().Speed
+end)
+
+
+Character:AddSlider({
+    Name = "WalkSpeed",
+    Min = 0,
+    Max = 40,
+    Default = 16,
+    Color = Color3.fromRGB(255,255,255),
+    Increment = 1,
+    Callback = function(v)
+        getgenv().Speed = v
+        if game.Players.LocalPlayer.Character then
+            game.Players.LocalPlayer.Character:WaitForChild("Humanoid").WalkSpeed = getgenv().Speed
+        end
+    end    
+})
+
+
+
+disableConnection(game:GetService("ScriptContext").Error)
