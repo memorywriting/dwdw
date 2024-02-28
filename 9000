@@ -455,11 +455,11 @@ local function toggleSnipeScript(Value)
 end
 
 Main:AddToggle({
-	Name = "Snipe Players",
-	Default = false,
-	Callback = function(Value)
-		toggleSnipeScript()
-	end    
+    Name = "Snipe Players",
+    Default = false,
+    Callback = function(Value)
+        toggleSnipeScript(Value)
+    end    
 })
 
 
