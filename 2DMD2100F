@@ -1580,26 +1580,33 @@ local RunService, Workspace, camera = game:GetService("RunService"), game:GetSer
 local connections = {}
 
 local function createESP(v)
-    local textbox = Drawing.new("Text")
-    textbox.Text = v.Name
-    textbox.Color = Color3.fromRGB(255, 105, 180)
-    textbox.Outline = true
-    textbox.OutlineColor = Color3.new(0, 0, 0)
-    textbox.Size = 15
-    textbox.Center = true
+    local billboardGui = Instance.new("BillboardGui")
+    local textLabel = Instance.new("TextLabel")
 
-    local connection = RunService.RenderStepped:Connect(function()
-        local pos = camera:WorldToViewportPoint(v.Part.Position)
-        textbox.Position = Vector2.new(pos.X, pos.Y + 1)
-        textbox.Visible = pos.Z > 0
+    billboardGui.Adornee = v.Part
+    billboardGui.Size = UDim2.new(0, 100, 0, 50)
+    billboardGui.StudsOffset = Vector3.new(0, 5, 0) 
+    billboardGui.AlwaysOnTop = true
+    billboardGui.Parent = Workspace
+
+    textLabel.BackgroundTransparency = 1
+    textLabel.Size = UDim2.new(0, 100, 0, 50)
+    textLabel.Font = Enum.Font.SourceSansBold
+    textLabel.Text = v.Name
+    textLabel.TextColor3 = Color3.new(1, 0, 0) 
+    textLabel.TextScaled = true
+    textLabel.Parent = billboardGui
+
+    return billboardGui, billboardGui.Changed:Connect(function()
+        if not v or not v.Part then
+            billboardGui:Destroy()
+        end
     end)
-
-    return textbox, connection
 end
 
 local function clearESP()
     for _, v in pairs(connections) do
-        v[1]:Remove()
+        v[1]:Destroy()
         v[2]:Disconnect()
     end
     connections = {}
@@ -1612,8 +1619,8 @@ espTab:AddToggle({
         if Value then
             for i, v in pairs(Workspace.Hearts:GetChildren()) do
                 if v:IsA("Model") and v:FindFirstChild("Part") then
-                    local textbox, connection = createESP(v)
-                    table.insert(connections, {textbox, connection})
+                    local billboardGui, connection = createESP(v)
+                    table.insert(connections, {billboardGui, connection})
                 end
             end
         else
@@ -1621,7 +1628,6 @@ espTab:AddToggle({
         end
     end
 })
-
 
 
 OrionLib:Init()
