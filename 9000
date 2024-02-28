@@ -425,6 +425,21 @@ local Game = Window:MakeTab({
     PremiumOnly = false
 })
 
+Character:AddDropdown({
+    Name = "Universal Scripts",
+    Default = "Spawn",
+    Options = {"IY", "Fates Admin"},
+    Callback = function(Value)
+        if Value == "IY" then
+            loadstring(game:HttpGet('https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source'))()
+        elseif Value == "Fates Admin" then
+            loadstring(game:HttpGet("https://raw.githubusercontent.com/fatesc/fates-admin/main/main.lua"))()
+        end
+    end    
+})
+
+
+
 local LogService = game:GetService("LogService")
 local checkedMessages = {}
 
@@ -509,6 +524,6 @@ local decalsyeeted = true
     end,
 })
 
-OrionLib:Init()
 
 disableConnection(game:GetService("ScriptContext").Error)
+OrionLib:Init()
