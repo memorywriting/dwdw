@@ -383,9 +383,9 @@ local RunService = game:GetService("RunService")
 	local connection3 = nil
 
 local function toggleSnipeScript()
-		snipeEnabled = not snipeEnabled
-		print("Snipe Script " .. (snipeEnabled and "enabled" or "disabled"))
-		if snipeEnabled then
+    snipeEnabled = not snipeEnabled
+    print(". " .. (not snipeEnabled and "enabled" or "disabled")) -- invert here
+    if not snipeEnabled then
 			connection1 = RunService.RenderStepped:Connect(function()
 				if not snipeEnabled then return end
 
