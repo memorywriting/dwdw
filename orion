@@ -83,6 +83,8 @@ local OrionLib = {
     SaveCfg = false
 }
 
+print("a")
+
 --Feather Icons https://github.com/evoincorp/lucideblox/tree/master/src/modules/util - Created by 7kayoh
 local Icons = {}
 
