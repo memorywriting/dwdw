@@ -383,10 +383,10 @@ local connection1 = nil
 local connection2 = nil
 local connection3 = nil
 
-local function toggleSnipeScript()
-	snipeEnabled = not snipeEnabled
-	print("Snipe Script " .. (snipeEnabled and "enabled" or "disabled"))
-	if snipeEnabled then
+local function toggleSnipeScript(Value)
+    snipeEnabled = Value
+    print(". " .. (snipeEnabled and "enabled" or "disabled"))
+    if snipeEnabled then
 		connection1 = RunService.RenderStepped:Connect(function()
 			if not snipeEnabled then return end
 
