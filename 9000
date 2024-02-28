@@ -336,7 +336,7 @@ game:GetService("RunService").RenderStepped:connect(
 Main:AddLabel("Miscellaneous")
 
 local Players = game:GetService("Players")
-
+local RunService = game:GetService("RunService")
 	local LocalPlayer = Players.LocalPlayer
 	local Mouse = LocalPlayer:GetMouse()
 	local HighlightColor = Color3.fromRGB(255, 0, 0) 
