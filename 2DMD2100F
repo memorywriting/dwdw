@@ -1,7 +1,5 @@
-for _,v in next, getconnections(game:GetService("LogService").MessageOut) do
-    v:Disable()
- end
- for _,v in next, getconnections(game:GetService("ScriptContext").Error) do
+
+for _,v in next, getconnections(game:GetService("ScriptContext").Error) do
     v:Disable()
  end
  
@@ -1497,19 +1495,26 @@ farmingTab:AddToggle({
         getgenv().autoSwing = t
     end,
 })
-
 game:GetService("RunService").RenderStepped:Connect(function()
     if getgenv().autoSwing then
+        local closestDistance = math.huge
+        local closestResource = nil
+
         for i,v in pairs(game:GetService("Workspace").Resources:GetChildren()) do
             if v and v.Name ~= "Barley" and v.Name ~= "Corn" and v.PrimaryPart then
                 local distance = (game.Players.LocalPlayer.Character.HumanoidRootPart.Position - v.PrimaryPart.Position).magnitude
-                if distance < 10 then
-                    local attackTable = {
-                        [1] = v.PrimaryPart
-                    }
-                    game:GetService("ReplicatedStorage").Events.SwingTool:FireServer(attackTable)
+                if distance < closestDistance then
+                    closestDistance = distance
+                    closestResource = v
                 end
             end
+        end
+
+        if closestResource and closestDistance < 10 then
+            local attackTable = {
+                [1] = closestResource.PrimaryPart
+            }
+            game:GetService("ReplicatedStorage").Events.SwingTool:FireServer(attackTable)
         end
     end
 end)
@@ -1576,41 +1581,230 @@ farmingTab:AddToggle({
 	end,
 })
 
-local RunService, Workspace, camera = game:GetService("RunService"), game:GetService("Workspace"), game.Workspace.CurrentCamera
-local connections = {}
+getgenv().mobAura = false
+farmingTab:AddToggle({
+   Name = "Mob Aura",
+   Default = getgenv().autoSwing,
+   Callback = function(t)
+   getgenv().mobAura = t
+   spawn(function()
+   game:GetService("RunService").RenderStepped:Connect(function()
+   if getgenv().mobAura then
+      for i,v in pairs(game:GetService("Workspace").Critters:GetChildren()) do
+         if v ~= nil and v.PrimaryPart ~= nil and (game:GetService("Players").LocalPlayer.Character.HumanoidRootPart.Position - v.PrimaryPart.Position).magnitude < 10 then
+            local attackTable = {
+               [1] = v.PrimaryPart
+            }
+            game:GetService("ReplicatedStorage").Events.SwingTool:FireServer(attackTable)
+         end
+      end
+   end
+   end)
+   end)
+   end})
 
-local function createESP(v)
-    local billboardGui = Instance.new("BillboardGui")
-    local textLabel = Instance.new("TextLabel")
+local UserInputService, Player = game:GetService("UserInputService"), game.Players.LocalPlayer
+local Mouse, RunService, Root = Player:GetMouse(), game:GetService("RunService"), Player.Character.HumanoidRootPart
+local CrittersFolder = game.Workspace:FindFirstChild("Critters")
 
-    billboardGui.Adornee = v.Part
-    billboardGui.Size = UDim2.new(0, 100, 0, 50)
-    billboardGui.StudsOffset = Vector3.new(0, 5, 0) 
-    billboardGui.AlwaysOnTop = true
-    billboardGui.Parent = Workspace
+farmingTab:AddToggle({
+   Name = "Bird AutoFarm",
+   Callback = function(t)
+      getgenv().autoSwing = t
+      getgenv().birdTeleport = t
 
-    textLabel.BackgroundTransparency = 1
-    textLabel.Size = UDim2.new(0, 100, 0, 50)
-    textLabel.Font = Enum.Font.SourceSansBold
-    textLabel.Text = v.Name
-    textLabel.TextColor3 = Color3.new(1, 0, 0) 
-    textLabel.TextScaled = true
-    textLabel.Parent = billboardGui
+      function findFirstBird()
+         for _,v in pairs(CrittersFolder:GetChildren()) do
+            if v.Name == "Bird" then
+               return v:findFirstChild("HumanoidRootPart")
+            end
+         end
+      end
 
-    return billboardGui, billboardGui.Changed:Connect(function()
-        if not v or not v.Part then
-            billboardGui:Destroy()
-        end
-    end)
-end
+      RunService.RenderStepped:Connect(function()
+         if getgenv().birdTeleport then
+            local Bird = findFirstBird()
+            if Bird then 
+               game:GetService("Players").LocalPlayer.Character.HumanoidRootPart.CFrame = Bird.CFrame
+            end
+         end
+      end)
 
-local function clearESP()
-    for _, v in pairs(connections) do
-        v[1]:Destroy()
-        v[2]:Disconnect()
-    end
-    connections = {}
-end
+      task.spawn(function()
+         while getgenv().birdTeleport do
+            task.wait()
+            local Bird = findFirstBird()
+            if Bird then 
+               game:GetService("Players").LocalPlayer.Character.HumanoidRootPart.CFrame = Bird.CFrame
+            end
+         end
+      end)
+
+      game:GetService("RunService").RenderStepped:Connect(function()
+   if getgenv().autoSwing then
+      for i,v in pairs(game:GetService("Workspace"):GetChildren()) do
+         if v ~= nil and v.Name == "Pumpkin Patch" and v.PrimaryPart ~= nil and (game:GetService("Players").LocalPlayer.Character.HumanoidRootPart.Position - v.PrimaryPart.Position).Magnitude < 10 then
+            local attackTable = {
+               [1] = v.PrimaryPart
+            }
+            game:GetService("ReplicatedStorage").Events.SwingTool:FireServer(attackTable)
+         end
+      end
+   end
+   end)
+   end
+})
+
+
+   miscTab:AddButton({
+      Name = "rejoin",
+      Callback = function()
+      wait(1)
+      local TeleportService = game:GetService("TeleportService")
+      local Players = game:GetService("Players")
+      local LocalPlayer = Players.LocalPlayer
+
+      local Rejoin = coroutine.create(function()
+      local Success, ErrorMessage = pcall(function()
+      TeleportService:Teleport(game.PlaceId, LocalPlayer)
+      end)
+
+      if ErrorMessage and not Success then
+         warn(ErrorMessage)
+      end
+      end)
+
+      coroutine.resume(Rejoin)
+      end,
+   })
+
+   miscTab:AddButton({
+      Name = "serverhop",
+      Callback = function()
+      wait(1)
+
+      local PlaceID = game.PlaceId
+      local AllIDs = {}
+      local foundAnything = ""
+      local actualHour = os.date("!*t").hour
+      local Deleted = false
+
+      function TPReturner()
+         local Site;
+         if foundAnything == "" then
+            Site = game.HttpService:JSONDecode(game:HttpGet('https://games.roblox.com/v1/games/' .. PlaceID .. '/servers/Public?sortOrder=Asc&limit=100'))
+         else
+            Site = game.HttpService:JSONDecode(game:HttpGet('https://games.roblox.com/v1/games/' .. PlaceID .. '/servers/Public?sortOrder=Asc&limit=100&cursor=' .. foundAnything))
+         end
+         local ID = ""
+         if Site.nextPageCursor and Site.nextPageCursor ~= "null" and Site.nextPageCursor ~= nil then
+            foundAnything = Site.nextPageCursor
+         end
+         local num = 0;
+         for i,v in pairs(Site.data) do
+            local Possible = true
+            ID = tostring(v.id)
+            if tonumber(v.maxPlayers) > tonumber(v.playing) then
+               for _,Existing in pairs(AllIDs) do
+                  if num ~= 0 then
+                     if ID == tostring(Existing) then
+                        Possible = false
+                     end
+                  else
+                     if tonumber(actualHour) ~= tonumber(Existing) then
+                        local delFile = pcall(function()
+                        -- delfile("NotSameServers.json")
+                        AllIDs = {}
+                        table.insert(AllIDs, actualHour)
+                        end)
+                     end
+                  end
+                  num = num + 1
+               end
+               if Possible == true then
+                  table.insert(AllIDs, ID)
+                  wait()
+                  pcall(function()
+                  -- writefile("NotSameServers.json", game:GetService('HttpService'):JSONEncode(AllIDs))
+                  wait()
+                  game:GetService("TeleportService"):TeleportToPlaceInstance(PlaceID, ID, game.Players.LocalPlayer)
+                  end)
+                  wait(4)
+               end
+            end
+         end
+      end
+
+      function Teleport()
+         while wait() do
+            pcall(function()
+            TPReturner()
+            if foundAnything ~= "" then
+               TPReturner()
+            end
+            end)
+         end
+      end
+
+      Teleport()
+      end,
+   })
+
+   miscTab:AddButton({
+      Name = "Reduce Lag",
+      Callback = function()
+      local decalsyeeted = true
+      local g = game
+      local w = g.Workspace
+      local l = g.Lighting
+      local t = w.Terrain
+      t.WaterWaveSize = 0
+      t.WaterWaveSpeed = 0
+      t.WaterReflectance = 0
+      t.WaterTransparency = 0
+      l.GlobalShadows = false
+      l.FogEnd = 9e9
+      l.Brightness = 0
+      settings().Rendering.QualityLevel = "Level01"
+      for i, v in pairs(g:GetDescendants()) do
+         if v:IsA("Part") or v:IsA("Union") or v:IsA("CornerWedgePart") or v:IsA("TrussPart") then
+            v.Material = "Plastic"
+            v.Reflectance = 0
+         elseif v:IsA("Decal") or v:IsA("Texture") and decalsyeeted then
+            v.Transparency = 1
+         elseif v:IsA("ParticleEmitter") or v:IsA("Trail") then
+            v.Lifetime = NumberRange.new(0)
+         elseif v:IsA("Explosion") then
+            v.BlastPressure = 1
+            v.BlastRadius = 1
+         elseif v:IsA("Fire") or v:IsA("SpotLight") or v:IsA("Smoke") then
+            v.Enabled = false
+         elseif v:IsA("MeshPart") then
+            v.Material = "Plastic"
+            v.Reflectance = 0
+            v.TextureID = 10385902758728957
+         end
+      end
+      end,
+   })
+
+   worldTab:AddButton({
+      Name = "Teleport Void",
+      Callback = function()
+      tpVoid()
+      end,
+   })
+
+   worldTab:AddButton({
+      Name = "Teleport Main World",
+      Callback = function()
+      tpMain()
+      end,
+   })
+
+espTab:AddLabel("Hearts")
+local RunService, Workspace = game:GetService("RunService"), game:GetService("Workspace")
+local billboardGuis = {}
 
 espTab:AddToggle({
     Name = "Heart ESP",
@@ -1619,15 +1813,100 @@ espTab:AddToggle({
         if Value then
             for i, v in pairs(Workspace.Hearts:GetChildren()) do
                 if v:IsA("Model") and v:FindFirstChild("Part") then
-                    local billboardGui, connection = createESP(v)
-                    table.insert(connections, {billboardGui, connection})
+                    local billboardGui = Instance.new("BillboardGui")
+                    local textLabel = Instance.new("TextLabel")
+
+                    billboardGui.Adornee = v.Part
+                    billboardGui.Size = UDim2.new(0, 100, 0, 50)
+                    billboardGui.StudsOffset = Vector3.new(0, 5, 0) 
+                    billboardGui.AlwaysOnTop = true
+                    billboardGui.Parent = Workspace
+
+                    textLabel.BackgroundTransparency = 1
+                    textLabel.Size = UDim2.new(0, 100, 0, 50)
+                    textLabel.Font = Enum.Font.SourceSansBold
+                    textLabel.Text = v.Name
+                    textLabel.TextColor3 = Color3.new(1, 0, 0) 
+                    textLabel.TextScaled = true
+                    textLabel.Parent = billboardGui
+
+                    table.insert(billboardGuis, billboardGui)
                 end
             end
         else
-            clearESP()
+            for _, gui in pairs(billboardGuis) do
+                gui:Destroy()
+            end
+            billboardGuis = {}
         end
     end
 })
+
+
+
+espTab:AddLabel("Ores")
+
+espTab:AddToggle({
+   Name = "Adurite & Adurite Rich Esp",
+   Callback = function(Value)
+   _G.AduriteEsp = Value
+   aduriteEsp()
+   end,
+})
+
+espTab:AddToggle({
+   Name = "Crystal Lode Esp",
+   Callback = function(Value)
+   _G.CrystalLodeEsp = Value
+   crystallodeEsp()
+   end,
+})
+
+espTab:AddToggle({
+   Name = "Gold Esp",
+   Callback = function(Value)
+   _G.GoldEsp = Value
+   goldEsp()
+   end,
+})
+
+espTab:AddToggle({
+   Name = "Iron Esp",
+   Callback = function(Value)
+   _G.IronNodeEsp = Value
+   ironnodeEsp()
+   end,
+})
+
+espTab:AddLabel("Meteors")
+
+espTab:AddToggle({
+   Name = "Crystal Meteor",
+   Callback = function(Value)
+   _G.CrystalMeteorRockEsp = Value
+   crystalmeteorrockEsp()
+   end,
+})
+
+
+espTab:AddToggle({
+   Name = "Meteor Rock (Raw Magnetite)",
+   Callback = function(Value)
+   _G.MeteorRockEsp = Value
+   meteorrockEsp()
+   end,
+})
+
+espTab:AddLabel("Gods")
+
+espTab:AddToggle({
+   Name = "Old God",
+   Callback = function(Value)
+   _G.OldGodEsp = Value
+   OldGodEsp()
+   end,
+})
+
 
 
 OrionLib:Init()
