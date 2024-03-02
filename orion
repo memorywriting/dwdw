@@ -100,7 +100,7 @@ local function GetIcon(IconName)
 end   
 
 local Orion = getgenv().Instance.new("ScreenGui")
-Orion.Name = "XyZaBcDfGh"
+Orion.Name = HttpService:GenerateGUID()
 if syn then
 	syn.protect_gui(Orion)
 	Orion.Parent = game.CoreGui
