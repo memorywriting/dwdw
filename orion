@@ -5,7 +5,7 @@ local LocalPlayer = game:GetService("Players").LocalPlayer
 local Mouse = LocalPlayer:GetMouse()
 local HttpService = getgenv().game:GetService("HttpService")
 
-local OrionLib = {
+local getgenv().OrionLib = {
     Elements = {},
     ThemeObjects = {},
     Connections = {},
