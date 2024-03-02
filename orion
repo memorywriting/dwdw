@@ -4,7 +4,7 @@ local TweenService = game:GetService("TweenService")
 local RunService = game:GetService("RunService")
 local LocalPlayer = game:GetService("Players").LocalPlayer
 local Mouse = LocalPlayer:GetMouse()
-local HttpService = getgenv().game:GetService("HttpService")
+local HttpService = game:GetService("HttpService")
 
 local OrionLib = {
     Elements = {},
@@ -103,7 +103,7 @@ local function GetIcon(IconName)
 	end
 end   
 
-local Orion = getgenv().Instance.new("ScreenGui")
+local Orion = Instance.new("ScreenGui")
 Orion.Name = "XyZaBcDfGh"
 if syn then
 	syn.protect_gui(Orion)
